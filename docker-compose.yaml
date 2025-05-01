@@ -45,7 +45,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_DATASOURCE_HOST=users-service-db
-      - SPRING_DATASOURCE_PORT=5441
+      - SPRING_DATASOURCE_PORT=5432
       - SPRING_DISCOVERY_SERVER_HOST=discovery-server
     networks:
       - room-booking
@@ -66,8 +66,8 @@ services:
       interval: 10s
       retries: 5
       # для сохранения данных в БД после закрытия Docker
-    #volumes:
-      #- users-service-db-data:/var/lib/postgresql/data
+    volumes:
+      - users-service-db-data:/var/lib/postgresql/data
     restart: unless-stopped
 
     networks:
@@ -91,7 +91,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_DATASOURCE_HOST=booking-service-db
-      - SPRING_DATASOURCE_PORT=5442
+      - SPRING_DATASOURCE_PORT=5432
       - SPRING_DISCOVERY_SERVER_HOST=discovery-server
     networks:
       - room-booking
@@ -113,8 +113,8 @@ services:
       interval: 10s
       retries: 5
       # для сохранения данных в БД после закрытия Docker - ещё необходимо раскомментировать volumes  в конце файла
-    #volumes:
-      #- booking-service-db-data:/var/lib/postgresql/data
+    volumes:
+      - booking-service-db-data:/var/lib/postgresql/data
 
     networks:
       - room-booking
@@ -137,7 +137,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_DATASOURCE_HOST=room-service-db
-      - SPRING_DATASOURCE_PORT=5443
+      - SPRING_DATASOURCE_PORT=5432
       - SPRING_DISCOVERY_SERVER_HOST=discovery-server
     networks:
       - room-booking
@@ -158,8 +158,8 @@ services:
       interval: 10s
       retries: 5
       # для сохранения данных в БД после закрытия Docker - ещё необходимо раскомментировать volumes  в конце файла
-    #volumes:
-      #- room-service-db-data:/var/lib/postgresql/data
+    volumes:
+      - room-service-db-data:/var/lib/postgresql/data
 
     networks:
       - room-booking
@@ -182,7 +182,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_DATASOURCE_HOST=notification-service-db
-      - SPRING_DATASOURCE_PORT=5444
+      - SPRING_DATASOURCE_PORT=5432
       - SPRING_DISCOVERY_SERVER_HOST=discovery-server
     networks:
       - room-booking
@@ -203,14 +203,14 @@ services:
       interval: 10s
       retries: 5
       # для сохранения данных в БД после закрытия Docker - ещё необходимо раскомментировать volumes  в конце файла
-    #volumes:
-      #- notification-service-db-data:/var/lib/postgresql/data
+    volumes:
+      - notification-service-db-data:/var/lib/postgresql/data
     networks:
       - room-booking
 
       # для сохранения данных в БД после закрытия Docker
-#volumes:
-  #room-service-db-data:
-  #booking-service-db-data:
-  #users-service-db-data:
-  #notification-service-db-data:
+volumes:
+  room-service-db-data:
+  booking-service-db-data:
+  users-service-db-data:
+  notification-service-db-data:
