@@ -1,0 +1,47 @@
+server:
+  port: 8091
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:5432}/users_db #jdbc:postgresql://users-service-db:5432/users_db
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
+  application:
+    name: users-service
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate.jdbc.time_zone: UTC
+      hibernate.format_sql: true
+    show-sql: true
+
+  sql:
+    init:
+      mode: always
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${SPRING_DISCOVERY_SERVER_HOST:localhost}:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+logging:
+  level:
+    org.springframework.orm.jpa: INFO
+    org.springframework.transaction: INFO
+    org.springframework.web: INFO
+
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    user: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:5432}/users_db  #jdbc:postgresql://users-service-db:5432/users_db
+
+environment:
+  - SPRING_LIQUIBASE_CHANGELOG=classpath:/db/changelog/db.changelog-master.yaml
+  - SPRING_LIQUIBASE_CONTEXTS=default

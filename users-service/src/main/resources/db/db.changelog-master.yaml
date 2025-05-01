@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: initial_schema
+      author: Andr33w
+      changes:
+        - sqlFile:
+            encoding: UTF-8
+            relativeToChangelogFile: true
+            path: schema.sql
+            splitStatements: false
+            stripComments: true

@@ -1,0 +1,216 @@
+
+networks:
+  room-booking:
+    driver: bridge
+
+services:
+  discovery-server:
+    build: discovery-server
+    image: discovery-server:latest
+    container_name: discovery-server
+    ports:
+      - "8761:8761" # Map port 8761 of the container to port 8761 on the host machine
+    networks:
+      - room-booking
+
+  api-gateway:
+    build: api-gateway
+    image: api-gateway:latest
+    container_name: api-gateway
+    ports:
+      - "8080:8080" # Map port 8080 of the container to port 8080 on the host machine
+    depends_on:
+      discovery-server:
+        condition: service_started
+    environment:
+      - SPRING_DISCOVERY_SERVER_HOST=discovery-server
+    networks:
+      - room-booking
+
+  users-service:
+    build: users-service
+    image: users-service:latest
+    container_name: users-service
+    ports:
+      - "8091:8091" # Map port 8091 of the container to port 8081 on the host machine
+    depends_on:
+      api-gateway:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+      users-service-db:
+        condition: service_started
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://users-service-db:5432/users_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_HOST=users-service-db
+      - SPRING_DATASOURCE_PORT=5441
+      - SPRING_DISCOVERY_SERVER_HOST=discovery-server
+    networks:
+      - room-booking
+
+  users-service-db:
+    image: postgres:16.1
+    container_name: users-service-db
+    ports:
+      - "5441:5432"
+    environment:
+      - POSTGRES_DB=users_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      start_period: 10s
+      timeout: 5s
+      interval: 10s
+      retries: 5
+      # для сохранения данных в БД после закрытия Docker
+    #volumes:
+      #- users-service-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+    networks:
+      - room-booking
+
+  booking-service:
+    build: booking-service
+    image: booking-service:latest
+    container_name: booking-service
+    ports:
+      - "8092:8092"
+    depends_on:
+      api-gateway:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+      booking-service-db:
+        condition: service_started
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://booking-service-db:5432/booking_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_HOST=booking-service-db
+      - SPRING_DATASOURCE_PORT=5442
+      - SPRING_DISCOVERY_SERVER_HOST=discovery-server
+    networks:
+      - room-booking
+
+
+  booking-service-db:
+    image: postgres:16.1
+    container_name: booking-service-db
+    ports:
+      - "5442:5432" # Map port 5432 of the container to port 5442 on the host machine
+    environment:
+      - POSTGRES_DB=booking_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      start_period: 10s
+      timeout: 5s
+      interval: 10s
+      retries: 5
+      # для сохранения данных в БД после закрытия Docker - ещё необходимо раскомментировать volumes  в конце файла
+    #volumes:
+      #- booking-service-db-data:/var/lib/postgresql/data
+
+    networks:
+      - room-booking
+
+  room-service:
+    build: room-service
+    image: room-service:latest
+    container_name: room-service
+    ports:
+      - "8093:8093"
+    depends_on:
+      api-gateway:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+      room-service-db:
+        condition: service_started
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://room-service-db:5432/room_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_HOST=room-service-db
+      - SPRING_DATASOURCE_PORT=5443
+      - SPRING_DISCOVERY_SERVER_HOST=discovery-server
+    networks:
+      - room-booking
+
+  room-service-db:
+    image: postgres:16.1
+    container_name: room-service-db
+    ports:
+      - "5443:5432" # Map port 5432 of the container to port 5443 on the host machine
+    environment:
+      - POSTGRES_DB=room_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      start_period: 10s
+      timeout: 5s
+      interval: 10s
+      retries: 5
+      # для сохранения данных в БД после закрытия Docker - ещё необходимо раскомментировать volumes  в конце файла
+    #volumes:
+      #- room-service-db-data:/var/lib/postgresql/data
+
+    networks:
+      - room-booking
+
+  notification-service:
+    build: notification-service
+    image: notification-service:latest
+    container_name: notification-service
+    ports:
+      - "8094:8094"
+    depends_on:
+      api-gateway:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+      notification-service-db:
+        condition: service_started
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://notification-service-db:5432/notification_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_HOST=notification-service-db
+      - SPRING_DATASOURCE_PORT=5444
+      - SPRING_DISCOVERY_SERVER_HOST=discovery-server
+    networks:
+      - room-booking
+
+  notification-service-db:
+    image: postgres:16.1
+    container_name: notification-service-db
+    ports:
+      - "5444:5432" # Map port 5432 of the container to port 5444 on the host machine
+    environment:
+      - POSTGRES_DB=notification_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      start_period: 10s
+      timeout: 5s
+      interval: 10s
+      retries: 5
+      # для сохранения данных в БД после закрытия Docker - ещё необходимо раскомментировать volumes  в конце файла
+    #volumes:
+      #- notification-service-db-data:/var/lib/postgresql/data
+    networks:
+      - room-booking
+
+      # для сохранения данных в БД после закрытия Docker
+#volumes:
+  #room-service-db-data:
+  #booking-service-db-data:
+  #users-service-db-data:
+  #notification-service-db-data:
