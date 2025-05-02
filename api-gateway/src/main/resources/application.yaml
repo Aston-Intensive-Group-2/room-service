@@ -16,6 +16,11 @@ spring:
           uri: lb://users-service
           predicates:
             - Path=/api/v1/users/**
+            #- Path=/api/v1/admin/**
+        - id: admin-service
+          uri: lb://users-service
+          predicates:
+            - Path=/api/v1/admin/**
 
         - id: notification-service #8094/notifications
           uri: lb://notification-service
