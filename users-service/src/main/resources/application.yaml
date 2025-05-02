@@ -25,7 +25,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://${SPRING_DISCOVERY_SERVER_HOST:localhost}:8761/eureka/
+      defaultZone: http://${SPRING_DISCOVERY_SERVER_HOST:discovery-server}:8761/eureka/
   instance:
     preferIpAddress: true
 
@@ -35,13 +35,6 @@ logging:
     org.springframework.transaction: INFO
     org.springframework.web: INFO
 
-  liquibase:
-    enabled: true
-    change-log: classpath:/db/changelog/db.changelog-master.yaml
-    user: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:5432}/users_db  #jdbc:postgresql://users-service-db:5432/users_db
-
-environment:
-  - SPRING_LIQUIBASE_CHANGELOG=classpath:/db/changelog/db.changelog-master.yaml
-  - SPRING_LIQUIBASE_CONTEXTS=default
+#environment:
+  #- SPRING_LIQUIBASE_CHANGELOG=classpath:/db/changelog/db.changelog-master.yaml
+  #- SPRING_LIQUIBASE_CONTEXTS=default

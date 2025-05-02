@@ -30,6 +30,7 @@ ___
 ## Основные микросервисы
 
 ### user-service:
+http://localhost:8080/api/v1/users<br>
 http://localhost:8091/api/v1/users<br>
 Сервис для менеджмента пользователей. Отвечает за:
 * создание пользователя
@@ -38,6 +39,7 @@ http://localhost:8091/api/v1/users<br>
 * выдачу DTO пользователя по валидному JWT
 
 ### booking-service:
+http://localhost:8080/api/v1/bookings<br>
 http://localhost:8092/api/v1/bookings<br>
 Сервис для создания и отправки уведомлений. Отвечает за:
 * бронирование комнаты
@@ -47,6 +49,7 @@ http://localhost:8092/api/v1/bookings<br>
 * историю бронирования
 
 ### room-service:
+http://localhost:8080/api/v1/rooms<br>
 http://localhost:8093/api/v1/rooms<br>
 Сервис для создания и отправки уведомлений. Отвечает за:
 * отображение списка помещений
@@ -55,6 +58,7 @@ http://localhost:8093/api/v1/rooms<br>
 * оснащение?
 
 ### notifications:
+http://localhost:8080/api/v1/notifications<br>
 http://localhost:8094/api/v1/notifications<br>
 Сервис для создания и отправки уведомлений. Отвечает за:
 * создание уведомлений
