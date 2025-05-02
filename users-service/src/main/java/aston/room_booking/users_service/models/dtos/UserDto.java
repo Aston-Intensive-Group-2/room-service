@@ -4,6 +4,11 @@ import aston.room_booking.users_service.models.enums.UserRole;
 
 import java.util.Date;
 
+/**
+ *
+ * @version 1.0
+ * @author 4ndr33w
+ */
 public record UserDto (
         long id,
         String userName,

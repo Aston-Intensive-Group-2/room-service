@@ -3,9 +3,18 @@ package aston.room_booking.users_service.models.entities;
 import aston.room_booking.users_service.models.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
+/**
+ *
+ * @version 1.0
+ * @author 4ndr33w
+ */
 @Entity
 @Getter
 @Setter
@@ -13,7 +22,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @Column(name = "id", columnDefinition = "bigserial")
@@ -61,4 +70,14 @@ public class User {
     @Column(name = "last_login_date", columnDefinition = "timestamptz")
     @Builder.Default
     private Date lastLoginDate = new Date();
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(userRole);
+    }
+
+    @Override
+    public String getUsername() {
+        return userName;
+    }
 }

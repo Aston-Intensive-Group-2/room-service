@@ -1,17 +1,17 @@
 package aston.room_booking.users_service.controllers;
 
-import aston.room_booking.users_service.services.interfaces.BaseService;
+import aston.room_booking.users_service.services.interfaces.AdminService;
 import aston.room_booking.users_service.controllers.interfaces.UserController;
-import aston.room_booking.users_service.models.dtos.UserDto;
 import aston.room_booking.users_service.models.entities.User;
+import aston.room_booking.users_service.services.interfaces.UserService;
 import aston.room_booking.users_service.utils.StaticConstants;
-import aston.room_booking.users_service.utils.exceptions.ArgumentIsNullException;
+import aston.room_booking.users_service.utils.exceptions.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 
 /**
  * @author 4ndr33w
@@ -23,16 +23,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/users")
 public class UsersController implements UserController {
 
-private final BaseService userService;
-
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello from User Controller!";
-    }
+private final AdminService adminService;
+private final UserService userService;
 
     @Override
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody User user) {
+    public ResponseEntity<?> create (@RequestBody User user) throws EmailAlreadyUseException, DatabaseOperationException, ArgumentIsNullException, ErrorFetchingUserDataException {
         if(user == null) {
             log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
             throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
@@ -45,47 +41,42 @@ private final BaseService userService;
     }
 
     @Override
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable long id) {
-        var result = userService.getById(id);
-        if(result != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(result);
+    @GetMapping
+    public ResponseEntity<?> get (@RequestHeader(value = "Authorization") String authorizationHeader) throws UserNotFoundException, ErrorFetchingUserDataException, TokenValidationException, DatabaseOperationException {
+
+        var userDto = userService.get();
+        if(userDto != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(userDto);
         }
-        return null;
+        else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
+        }
     }
-
-    @Override
-    public UserDto getByEmail(String email) {
-        return null;
-    }
-
-    @Override
-    public UserDto getByUserName(String userName) {
-        return null;
-    }
-
-    @Override
-    public boolean changeEmail(String newEmail, long id) {
-        return false;
-    }
-
-    @Override
-    public boolean changePassword(String newPassword, long id) {
-        return false;
-    }
-
-
 
     @Override
     @DeleteMapping
-    public boolean deletById(long id) {
-        return false;
+    public ResponseEntity<?> delete (@RequestHeader(value = "Authorization") String authorizationHeader) throws UserNotFoundException, TokenValidationException, DatabaseOperationException {
+
+        var result = userService.delete();
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @Override
-    public UserDto updateById(long id, UserDto item) {
-        return null;
+    @PutMapping
+    public ResponseEntity<?> update (@RequestHeader(value = "Authorization") String authorizationHeader, @RequestBody User user) throws UserNotFoundException, TokenValidationException, ArgumentIsNullException, ErrorFetchingUserDataException, DatabaseOperationException {
+
+        var result = userService.update(user);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
     }
 
 
+    @Override
+    public ResponseEntity<?> changeEmail(@RequestBody String newEmail) {
+        return ResponseEntity.status(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED).body(false);
+    }
+
+    @Override
+    public ResponseEntity<?> changePassword(@RequestBody String newPassword) {
+        return ResponseEntity.status(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED).body(false);
+    }
 }

@@ -1,6 +1,18 @@
 package aston.room_booking.users_service.models.enums;
 
-public enum UserRole {
+import org.springframework.security.core.GrantedAuthority;
+
+/**
+ *
+ * @version 1.0
+ * @author 4ndr33w
+ */
+public enum UserRole implements GrantedAuthority {
     USER,
-    ADMIN
+    ADMIN;
+
+    @Override
+    public String getAuthority() {
+        return this.name();
+    }
 }

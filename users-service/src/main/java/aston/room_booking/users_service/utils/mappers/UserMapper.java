@@ -5,20 +5,32 @@ import aston.room_booking.users_service.models.entities.User;
 import aston.room_booking.users_service.utils.StaticConstants;
 import aston.room_booking.users_service.utils.exceptions.ErrorFetchingUserDataException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+/**
+ *
+ * Утильный класс-маппер;
+ * <br/>
+ * Осуществляет преобразование
+ * <br/>
+ * {@code entity} -> {@code DTO}
+ * <br/>
+ * {@code DTO} -> {@code entity}
+ *
+ * @version 1.0
+ * @author 4ndr33w
+ */
 @Slf4j
-@Configuration
+@Component
 public class UserMapper {
 
     public UserDto toDto(User user) {
         try {
             return new UserDto(
                     user.getId(),
-                    user.getUserName(),
+                    user.getUsername(),
                     user.getEmail(),
                     user.getFirstName(),
                     user.getLastName(),

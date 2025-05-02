@@ -1,31 +1,86 @@
 package aston.room_booking.users_service.services;
 
+import aston.room_booking.users_service.components.JwtTokenProvider;
+import aston.room_booking.users_service.models.dtos.MessageDto;
 import aston.room_booking.users_service.models.dtos.UserDto;
 import aston.room_booking.users_service.models.entities.User;
 import aston.room_booking.users_service.models.enums.UserRole;
 import aston.room_booking.users_service.repositories.interfaces.UserRepository;
-import aston.room_booking.users_service.services.interfaces.BaseService;
+import aston.room_booking.users_service.services.interfaces.UserService;
 import aston.room_booking.users_service.utils.PasswordHash;
 import aston.room_booking.users_service.utils.StaticConstants;
 import aston.room_booking.users_service.utils.exceptions.*;
 import aston.room_booking.users_service.utils.mappers.UserMapper;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import java.util.Date;
 
-import java.util.Collection;
-
+/**
+ *Сервис, реализующий интерфейс {@link UserService}
+ * <p>
+ *     Содержит операции по редактированию пользователем своего профиля
+ *     <br/>
+ *     на успешной аутенфикации по JWT-токену
+ * </p>
+ *
+ * @version 1.0
+ * @author 4ndr33w
+ *
+ * @see UserService
+ * @see UserDto
+ * @see User
+ */
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class UsersService implements BaseService<UserDto, User> {
+@AllArgsConstructor
+public class UsersService implements UserService<UserDto, User> {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordHash passwordHash;
 
     @Override
-    public UserDto create(User user) throws EmailAlreadyUseException, DatabaseOperationException, ArgumentIsNullException, ErrorFetchingUserDataException {
+    public UserDto get()
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException {
+
+        long userId = getUserIdFromSecurityContext();
+        var existingUserOptional = userRepository.findById(userId);
+
+        if(existingUserOptional.isPresent()) {
+            return userMapper.toDto(existingUserOptional.get());
+        }
+        else {
+            log.warn(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
+            throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
+        }
+    }
+
+    @Override
+    public MessageDto delete()
+            throws UserNotFoundException,
+            DatabaseOperationException {
+
+        long userId = getUserIdFromSecurityContext();
+        try {
+            userRepository.deleteById(userId);
+            return new MessageDto(new Date().toString(),StaticConstants.SUCCESSFUL_USER_DELETE_MESSAGE);
+        }
+        catch (Exception e) {
+            log.warn(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
+            throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
+        }
+    }
+
+    @Override
+    public UserDto create(User user)
+            throws EmailAlreadyUseException,
+            DatabaseOperationException,
+            ArgumentIsNullException,
+            ErrorFetchingUserDataException {
         if(user == null) {
             log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
             throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
@@ -36,122 +91,60 @@ public class UsersService implements BaseService<UserDto, User> {
         }
 
         String hashedPassword = passwordHash.createHash(user.getPassword());
-        user.setUserRole(UserRole.USER);
         user.setPassword(hashedPassword);
+        user.setUserRole(UserRole.USER);
 
-        var savedUser = userRepository.save(user);
-
-        if(savedUser != null) {
-            return userMapper.toDto(user);
+        try {
+            return userMapper.toDto(userRepository.save(user));
         }
-        else {
+        catch (Exception e) {
             log.error(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE);
             throw new DatabaseOperationException(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE);
         }
     }
 
     @Override
-    public Collection<UserDto> getAll() throws NoUsersFoundException, ErrorFetchingUserDataException {
-        var users = userRepository.findAll();
-        if (!users.isEmpty()) {
-            return users.stream().map(userMapper::toDto).toList();
-        }
-        log.warn(StaticConstants.NO_USERS_FOUND_EXCEPTION_MESSAGE);
-        throw new NoUsersFoundException(StaticConstants.NO_USERS_FOUND_EXCEPTION_MESSAGE);
-    }
+    public UserDto update(User updatingUser)
+            throws UserNotFoundException,
+            ArgumentIsNullException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException {
 
-    @Override
-    public UserDto getByEmail(String email) throws UserNotFoundException, ErrorFetchingUserDataException, ArgumentIsNullException {
-        if(email == null) {
-            log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
-            throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
+        try {
+            var updatedUser = getUpdatedUser(updatingUser);
+            var result = userRepository.save(updatedUser);
+            return userMapper.toDto(result);
         }
-        var userOptional = userRepository.findByEmail(email);
-
-        if(userOptional.isEmpty()) {
-            log.warn(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
-            throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
-        }
-        return userMapper.toDto(userOptional.get());
-    }
-
-    @Override
-    public UserDto getById(long id) {
-        var userOptional = userRepository.findById(id);
-
-        if(userOptional.isPresent()) {
-            return userMapper.toDto(userOptional.get());
-        }
-        else {
-            log.warn(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
-            throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
+        catch (Exception e) {
+            throw new DatabaseOperationException(StaticConstants.UNABLE_TO_UPDATE_USER_EXCEPTION_MESSAGE, e);
         }
     }
 
-    @Override
-    public UserDto getByUserName(String userName) throws UserNotFoundException, ErrorFetchingUserDataException, ArgumentIsNullException {
-        if(userName== null) {
-            log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
-            throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
-        }
-        var userOptional = userRepository.findByUserName(userName);
+    private long getUserIdFromSecurityContext() {
 
-        if(userOptional.isEmpty()) {
-            log.warn(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
-            throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
-        }
-        return userMapper.toDto(userOptional.get());
+        var user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return user.getId();
     }
 
-    @Override
-    public boolean deleteById(long id) throws UserNotFoundException {
-        var existingUserOptional = userRepository.findById(id);
-
-        if(existingUserOptional.isPresent()) {
-            userRepository.deleteById(id);
-            return true;
-        }
-        log.warn(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
-        throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
+    private User getUserFromSecurityContext() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    @Override
-    public UserDto update(long id, UserDto userDto) throws UserNotFoundException, ErrorFetchingUserDataException, ArgumentIsNullException {
-        if(userDto == null) {
-            log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
-            throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
-        }
+    private User getUpdatedUser(User userDto) {
 
-        var existingUserOptional = userRepository.findById(id);
+        var existingUser = getUserFromSecurityContext();
 
-        if(existingUserOptional.isEmpty()) {
-            log.warn(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
-            throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
-        }
-        var existingUser = existingUserOptional.get();
+        String newFirstName =  userDto.getFirstName() == null? existingUser.getFirstName() : userDto.getFirstName();
+        String newLastName = userDto.getLastName() == null? existingUser.getLastName() : userDto.getLastName();
+        String newPhone = userDto.getPhone() == null? existingUser.getPhone() : userDto.getPhone();
+        byte[] newImage = userDto.getImage() == null? existingUser.getImage() : userDto.getImage();
 
-        var updatedUser = getUpdatedUser(id, userDto, existingUser);
-
-        var result = userRepository.save(updatedUser);
-
-        if(result == null) {
-            throw new DatabaseOperationException(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE);
-        }
-        return userMapper.toDto(result);
-    }
-
-    private User getUpdatedUser(long id, UserDto userDto, User existingUser) {
-
-        String newFirstName =  userDto.firstName() == null? existingUser.getFirstName() : userDto.firstName();
-        String newLastName = userDto.lastName() == null? existingUser.getLastName() : userDto.lastName();
-        String newPhone = userDto.phone() == null? existingUser.getPhone() : userDto.phone();
-        byte[] newImage = userDto.image() == null? existingUser.getImage() : userDto.image();
-
-        existingUser.setFirstName(userDto.firstName());
-        existingUser.setLastName(userDto.lastName());
+        existingUser.setFirstName(newFirstName);
+        existingUser.setLastName(newLastName);
         existingUser.setPhone(newPhone);
         existingUser.setImage(newImage);
 
         return existingUser;
     }
+
 }

@@ -1,13 +1,28 @@
 package aston.room_booking.users_service.controllers.interfaces;
 
-import aston.room_booking.users_service.models.dtos.UserDto;
 import aston.room_booking.users_service.models.entities.User;
 
-public interface UserController extends BaseController<UserDto, User> {
+import aston.room_booking.users_service.utils.exceptions.*;
+import org.springframework.http.ResponseEntity;
 
-    UserDto getByEmail (String email);
-    UserDto getByUserName (String userName);
+/**
+ * Интерфейс контроллера пользовательских операций
+ *
+ * <p>
+ *     Предоставляет набор CRUD-операций управления пользователя данными своего профиля
+ *     по результату успешной аутенфикации
+ * </p>
+ *
+ * @version 1.0
+ * @author 4ndr33w
+ */
+public interface UserController {
 
-    boolean changeEmail (String newEmail, long id);
-    boolean changePassword (String newPassword, long id);
+    ResponseEntity<?> create(User entity) throws EmailAlreadyUseException, DatabaseOperationException, ArgumentIsNullException, ErrorFetchingUserDataException;
+    ResponseEntity<?> get (String authorizationHeader) throws UserNotFoundException, ErrorFetchingUserDataException, TokenValidationException, DatabaseOperationException;
+    ResponseEntity<?> delete (String authorizationHeader) throws UserNotFoundException, TokenValidationException, DatabaseOperationException;
+    ResponseEntity<?> update (String authorizationHeader, User user) throws UserNotFoundException, TokenValidationException, ArgumentIsNullException, ErrorFetchingUserDataException, DatabaseOperationException;
+
+    ResponseEntity<?> changeEmail (String newEmail);
+    ResponseEntity<?> changePassword (String newPassword);
 }

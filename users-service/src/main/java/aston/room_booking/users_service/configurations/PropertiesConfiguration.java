@@ -4,11 +4,18 @@ import lombok.Getter;
 
 import java.util.Properties;
 
-
+/**
+ * Утильный класс конфигурации;
+ * <br/>
+ * Осуществляет загрузку в константы значения из текстового файла конфигурации
+ *
+ * @version 1.0
+ * @author 4ndr33w
+ */
 public class PropertiesConfiguration {
 
     /**
-     * Получить параметры из конфигурационного файлф
+     * Получить параметры из конфигурационного файла
      */
     @Getter
     private static final Properties properties;

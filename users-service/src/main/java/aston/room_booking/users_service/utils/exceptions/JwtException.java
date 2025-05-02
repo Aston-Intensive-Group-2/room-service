@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @version 1.0
  * @author 4ndr33w
  */
-@ResponseStatus(value = HttpStatus.NOT_FOUND)
-public class NoUsersFoundException extends RuntimeException {
-  public NoUsersFoundException(String message) {
+@ResponseStatus(value = HttpStatus.FAILED_DEPENDENCY)
+public class JwtException extends RuntimeException {
+  public JwtException(String message) {
     super(message);
   }
-  public NoUsersFoundException(String message, Throwable e) {
+  public JwtException(String message, Throwable e) {
     super(message, e);
   }
 }

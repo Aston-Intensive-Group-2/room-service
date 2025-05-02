@@ -3,66 +3,85 @@ package aston.room_booking.users_service.controllers;
 import aston.room_booking.users_service.controllers.interfaces.AdminController;
 import aston.room_booking.users_service.models.dtos.UserDto;
 import aston.room_booking.users_service.models.entities.User;
-import aston.room_booking.users_service.services.interfaces.BaseService;
-import lombok.RequiredArgsConstructor;
-import org.apache.catalina.util.ResourceSet;
+import aston.room_booking.users_service.services.interfaces.AdminService;
+import aston.room_booking.users_service.utils.StaticConstants;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author 4ndr33w
  * @version 1.0
  */
+@Slf4j
 @RestController
-@RequiredArgsConstructor
+@AllArgsConstructor
 @RequestMapping("/api/v1/admin")
 public class AdminsController implements AdminController {
 
-    private final BaseService userService;
-
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello from Admin Controller!";
-    }
+    private final AdminService adminService;
 
     @Override
     @GetMapping
-    public ResponseEntity<?> getAll() {
-
-        Collection<UserDto> users = userService.getAll();
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> getAll(@RequestHeader(value = "Authorization") String authorizationHeader) {
+        Collection<UserDto> users = adminService.getAll();
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
     @Override
-    public boolean changeRole(String newRole, long id) {
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?>  getById(
+            @RequestHeader(value = "Authorization") String authorizationHeader,
+            @PathVariable long id) {
 
+        var result = adminService.getById(id);
 
-        return false;
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @Override
-    public ResponseEntity<?>  getById(long id) {
-        return null;
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> deletById(
+            @RequestHeader(value = "Authorization") String authorizationHeader,
+            @PathVariable long id) {
+
+        var result = adminService.deleteById(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @Override
-    public boolean deletById(long id) {
-        return false;
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> updateById(
+            @RequestHeader(value = "Authorization") String authorizationHeader,
+            @PathVariable long id,
+            @RequestBody User user) {
+
+        var result = adminService.update(id, user);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
     }
 
     @Override
-    public UserDto updateById(long id, UserDto item) {
-        return null;
-    }
+    @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> create(
+            @RequestHeader(value = "Authorization") String authorizationHeader,
+                                    @RequestBody User user) {
 
-    @Override
-    public ResponseEntity<?> create(User entity) {
-        return null;
+        var newUser = adminService.create(user);
+        if(newUser != null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(StaticConstants.UNABLE_TO_CREATE_NEW_USER);
     }
 }

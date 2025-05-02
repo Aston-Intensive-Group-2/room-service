@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @version 1.0
  * @author 4ndr33w
  */
-@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-public class ErrorFetchingUserDataException extends RuntimeException {
-    public ErrorFetchingUserDataException(String message) {
+@ResponseStatus(value = HttpStatus.FAILED_DEPENDENCY)
+public class TokenValidationException extends RuntimeException {
+    public TokenValidationException(String message) {
         super(message);
     }
-    public ErrorFetchingUserDataException(String message, Throwable e) {
+    public TokenValidationException(String message, Throwable e) {
         super(message, e);
     }
 }

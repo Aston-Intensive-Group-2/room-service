@@ -1,11 +1,13 @@
 package aston.room_booking.users_service.models.dtos;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-
+/**
+ *
+ * @version 1.0
+ * @author 4ndr33w
+ */
 public record ErrorDto(
-        OffsetDateTime dateTime,
+        String dateTime,
         int statusCode,
-        String path,
+        //String path,
         String message) {
 }

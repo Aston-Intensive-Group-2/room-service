@@ -32,6 +32,19 @@ ___
 ### user-service:
 http://localhost:8080/api/v1/users<br>
 http://localhost:8091/api/v1/users<br>
+Контроллер пользователей
+<hr/>
+
+http://localhost:8080/api/v1/admins<br>
+http://localhost:8091/api/v1/admins<br>
+Административный контролер
+<hr/>
+
+http://localhost:8080/account/login<br>
+http://localhost:8091/account/login<br>
+Точка входа, получение JWT-токена по мылу и паролю
+<hr/>
+
 Сервис для менеджмента пользователей. Отвечает за:
 * создание пользователя
 * редактирование и удаление пользователя
