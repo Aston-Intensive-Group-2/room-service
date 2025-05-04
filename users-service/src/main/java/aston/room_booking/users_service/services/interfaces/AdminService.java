@@ -86,7 +86,8 @@ public interface AdminService<D, E> {
      */
     Collection<D> getAll()
             throws NoUsersFoundException,
-            ErrorFetchingUserDataException;
+            ErrorFetchingUserDataException,
+            DatabaseOperationException;
 
     /**
      * Метод возвращает {@code D} DTO пользователя
@@ -103,7 +104,8 @@ public interface AdminService<D, E> {
     D getByEmail(String email)
             throws UserNotFoundException,
             ErrorFetchingUserDataException,
-            ArgumentIsNullException;
+            ArgumentIsNullException,
+            DatabaseOperationException;
 
     /**
      * Метод возвращает {@code D} DTO пользователя
@@ -118,7 +120,8 @@ public interface AdminService<D, E> {
      */
     D getById( long id)
             throws UserNotFoundException,
-            ErrorFetchingUserDataException;
+            ErrorFetchingUserDataException,
+            DatabaseOperationException;
 
     /**
      * Метод удаляет пользователя
@@ -131,7 +134,9 @@ public interface AdminService<D, E> {
      * @throws UserNotFoundException Пользователь с указанным {@code id} не найден
      */
     MessageDto deleteById(long id)
-            throws UserNotFoundException;
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException;
 
     /**
      * Метод обновления данных профиля пользователя
@@ -163,5 +168,6 @@ public interface AdminService<D, E> {
     D update(long id, E entity)
             throws UserNotFoundException,
             ErrorFetchingUserDataException,
-            ArgumentIsNullException;
+            ArgumentIsNullException,
+            DatabaseOperationException;
 }

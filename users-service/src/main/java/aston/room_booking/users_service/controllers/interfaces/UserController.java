@@ -18,11 +18,33 @@ import org.springframework.http.ResponseEntity;
  */
 public interface UserController {
 
-    ResponseEntity<?> create(User entity) throws EmailAlreadyUseException, DatabaseOperationException, ArgumentIsNullException, ErrorFetchingUserDataException;
-    ResponseEntity<?> get (String authorizationHeader) throws UserNotFoundException, ErrorFetchingUserDataException, TokenValidationException, DatabaseOperationException;
-    ResponseEntity<?> delete (String authorizationHeader) throws UserNotFoundException, TokenValidationException, DatabaseOperationException;
-    ResponseEntity<?> update (String authorizationHeader, User user) throws UserNotFoundException, TokenValidationException, ArgumentIsNullException, ErrorFetchingUserDataException, DatabaseOperationException;
+    ResponseEntity<?> create(User entity)
+            throws EmailAlreadyUseException,
+            DatabaseOperationException,
+            ErrorFetchingUserDataException;
 
-    ResponseEntity<?> changeEmail (String newEmail);
-    ResponseEntity<?> changePassword (String newPassword);
+    ResponseEntity<?> get ()
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException;
+
+    ResponseEntity<?> delete ()
+            throws UserNotFoundException,
+            TokenValidationException,
+            DatabaseOperationException;
+
+    ResponseEntity<?> update (User user)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException;
+
+    ResponseEntity<?> changeEmail (String newEmail)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException;
+
+    ResponseEntity<?> changePassword (String newPassword)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException;
 }

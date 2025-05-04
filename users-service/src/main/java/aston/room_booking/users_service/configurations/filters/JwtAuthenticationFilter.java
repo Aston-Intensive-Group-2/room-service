@@ -1,7 +1,11 @@
-package aston.room_booking.users_service.configurations;
+package aston.room_booking.users_service.configurations.filters;
 
 import aston.room_booking.users_service.components.JwtTokenProvider;
 
+import aston.room_booking.users_service.configurations.CustomAuthenticationManager;
+import aston.room_booking.users_service.utils.StaticConstants;
+import aston.room_booking.users_service.utils.exceptions.AuthenticationException;
+import aston.room_booking.users_service.utils.exceptions.TokenValidationException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +35,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final CustomAuthenticationManager authenticationManager;
 
     /**
      * Метод-фильтр.
@@ -58,11 +63,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String token = jwtTokenProvider.resolveToken(request);
-        if(token!=null && jwtTokenProvider.validateToken(token)){
+        Authentication authentication = authenticationManager.getAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+      /*  try {
+            String token = jwtTokenProvider.resolveToken(request);
+            Authentication authentication = authenticationManager.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+        catch (Exception e) {
+            logger.error("%s; %s".formatted(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE, e.getMessage()));
+            throw new TokenValidationException(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE);
+        }*/
         filterChain.doFilter(request,response);
     }
 }

@@ -1,7 +1,7 @@
 package aston.room_booking.users_service.controllers;
 
 import aston.room_booking.users_service.models.dtos.ErrorDto;
-import aston.room_booking.users_service.utils.exceptions.handlers.Handler;
+import aston.room_booking.users_service.utils.exceptions.handlers.ExceptionResolver;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @AllArgsConstructor
 public class ExceptionControllerAdvice {
 
-    private final Handler exceptionHandler;
+    private final ExceptionResolver exceptionExceptionResolver;
 
     /**
      * Метод перехватывает исключения в контроллерах, отправляет на опознание в утильный метод
@@ -30,7 +30,7 @@ public class ExceptionControllerAdvice {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
-        ErrorDto errorDto = exceptionHandler.handleException(e);
+        ErrorDto errorDto = exceptionExceptionResolver.handleException(e);
         return ResponseEntity.status(errorDto.statusCode()).body(errorDto);
     }
 }

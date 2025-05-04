@@ -1,6 +1,7 @@
 package aston.room_booking.users_service.controllers.interfaces;
 
 import aston.room_booking.users_service.models.entities.User;
+import aston.room_booking.users_service.utils.exceptions.*;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -23,17 +24,32 @@ public interface AdminController{
     /**
      * Метод контроллера предоставляет информацию ({@code UserDto}) о пользователе по его {@code id}
      *
-     * @param authorizationHeader
      * @param id
      *
-     * @return
+     * @return {@code ResponseEntity<UserDto>}
      */
-    ResponseEntity<?> getById(String authorizationHeader, long id);
+    ResponseEntity<?> getById(long id)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException;
 
-    ResponseEntity<?> deletById (String authorizationHeader, long id);
-    ResponseEntity<?> updateById(String authorizationHeader, long id, User entity);
+    ResponseEntity<?> deletById (long id)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException;
 
-    ResponseEntity<?> getAll(String authorizationHeader);
-    //ResponseEntity<?> changeRole (String authorizationHeader, String newRole, long id);
-    ResponseEntity<?> create(String authorizationHeader, User entity);
+    ResponseEntity<?> updateById(long id, User entity)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException;
+
+    ResponseEntity<?> getAll()
+            throws NoUsersFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException;
+    
+    ResponseEntity<?> create(User entity)
+            throws EmailAlreadyUseException,
+            DatabaseOperationException,
+            ErrorFetchingUserDataException;
 }

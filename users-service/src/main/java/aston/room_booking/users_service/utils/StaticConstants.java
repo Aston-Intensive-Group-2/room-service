@@ -20,6 +20,7 @@ public class StaticConstants {
     public static final String INVALID_USERNAME_OR_PASSWORD_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("INVALID_USERNAME_OR_PASSWORD_EXCEPTION_MESSAGE");
     public static final String USERNAME_OR_PASSWORD_IS_NULL_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("USERNAME_OR_PASSWORD_IS_NULL_EXCEPTION_MESSAGE");
     public static final String BASIC_AUTHORIZATION_HEADER_IS_MISSING_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("BASIC_AUTHORIZATION_HEADER_IS_MISSING_EXCEPTION_MESSAGE");
+    public static final String BEARER_AUTHORIZATION_HEADER_IS_MISSING_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("BEARER_AUTHORIZATION_HEADER_IS_MISSING_EXCEPTION_MESSAGE");
     public static final String DATABASE_ACCESS_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("DATABASE_ACCESS_EXCEPTION_MESSAGE");
     public static final String BAD_REQUEST_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("BAD_REQUEST_EXCEPTION_MESSAGE");
 
@@ -32,6 +33,7 @@ public class StaticConstants {
     public static final String SUCCESSFUL_USER_DELETE_MESSAGE = PropertiesConfiguration.getConstants().getProperty("SUCCESSFUL_USER_DELETE_MESSAGE");
     public static final String UNEXPECTED_ERROR_MESSAGE = PropertiesConfiguration.getConstants().getProperty("UNEXPECTED_ERROR_MESSAGE");
     public static final String FORBIDDEN_OPERATION_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("FORBIDDEN_OPERATION_EXCEPTION_MESSAGE");
+    public static final String AUTHENTICATION_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("AUTHENTICATION_EXCEPTION_MESSAGE");
 
     public static final String UNABLE_TO_FETCH_USER_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("UNABLE_TO_FETCH_USER_EXCEPTION_MESSAGE");
     public static final String UNABLE_TO_DELETE_USER_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("UNABLE_TO_DELETE_USER_EXCEPTION_MESSAGE");

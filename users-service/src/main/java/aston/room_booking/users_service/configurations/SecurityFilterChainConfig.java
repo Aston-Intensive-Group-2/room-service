@@ -1,10 +1,13 @@
 package aston.room_booking.users_service.configurations;
 
+import aston.room_booking.users_service.configurations.filters.ExceptionHndlerFilter;
+import aston.room_booking.users_service.configurations.filters.LoginAuthenticationFilter;
+import aston.room_booking.users_service.configurations.filters.JwtAuthenticationFilter;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,16 +31,18 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableMethodSecurity
 public class SecurityFilterChainConfig implements WebMvcConfigurer {
 
-    private final AuthenticationFilter authenticationFilter;
+    private final LoginAuthenticationFilter loginAuthenticationFilter;
     private final JwtAuthenticationFilter jwtAuthFilter;
+
+    private final ExceptionHndlerFilter exceptionHndlerFilter;
 
     /**
      * Фильтр безопасности; Определяет фильтрацию маршрутов: определяет к каким
      * эндпойнтам для каких типов запросов будет свободный доступ без аутенфикации;
      * <br/>
-     * К остальным эндпойнтам применяются фильтры
+     *
      * @param httpSecurity
-     * @return
+     * @return {@code SecurityFilterChain}
      * @throws Exception
      */
     @Bean
@@ -48,12 +53,12 @@ public class SecurityFilterChainConfig implements WebMvcConfigurer {
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
-                        .requestMatchers("/api/v1/admin/test").permitAll()
                         .requestMatchers(HttpMethod.POST,"/account/login").permitAll()
                         .requestMatchers("/swagger-ui/*").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
-                .addFilter(authenticationFilter)
+                .addFilterBefore(exceptionHndlerFilter, LoginAuthenticationFilter.class)
+                .addFilter(loginAuthenticationFilter)
                 .addFilterAfter(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .httpBasic(withDefaults())

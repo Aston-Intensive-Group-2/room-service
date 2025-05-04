@@ -2,29 +2,24 @@ package aston.room_booking.users_service.components;
 
 import aston.room_booking.users_service.models.entities.User;
 import aston.room_booking.users_service.utils.StaticConstants;
+import aston.room_booking.users_service.utils.exceptions.AuthorizationException;
 import aston.room_booking.users_service.utils.exceptions.JwtException;
 import aston.room_booking.users_service.repositories.interfaces.UserRepository;
 import aston.room_booking.users_service.utils.exceptions.TokenValidationException;
 
-import aston.room_booking.users_service.utils.exceptions.UserNotFoundException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -77,12 +72,13 @@ public class JwtTokenProvider {
                 .sign(algorithm);
     }
 
-    private DecodedJWT getDecodedToken(String token) {
+    private DecodedJWT getDecodedToken(String token) throws JwtException {
         try {
             return verifier.verify(token);
         }
         catch (JWTVerificationException e) {
             log.error("%s; %s".formatted(StaticConstants.JWT_VERIFICATION_EXCEPTION, e.getMessage()));
+
             throw new JwtException(StaticConstants.JWT_VERIFICATION_EXCEPTION);
         }
     }
@@ -95,7 +91,7 @@ public class JwtTokenProvider {
      *
      * @throws TokenValidationException ошибка декодирования токена
      */
-    public String getUserNameFromToken(String token) {
+    public String getUserNameFromToken(String token) throws TokenValidationException {
         try {
             var decodedToken = getDecodedToken(token);
 
@@ -155,7 +151,7 @@ public class JwtTokenProvider {
      *
      * @throws TokenValidationException в случае, если срок действия токена истёк
      */
-    private Optional<User> validateTokenAndReturnOptionalOfUser(String token) throws TokenValidationException {
+    public Optional<User> validateTokenAndReturnOptionalOfUser(String token) throws TokenValidationException {
         final String userName = getUserNameFromToken(token);
 
         var isTokenExpired = isTokenExpired(token);
@@ -173,31 +169,14 @@ public class JwtTokenProvider {
      * @return String {@code token} - JsonWebToken для Basic Auth
      */
     public String resolveToken (HttpServletRequest request) {
+        if(request.getHeader("Authorization") == null) {
+            throw new AuthorizationException(StaticConstants.BEARER_AUTHORIZATION_HEADER_IS_MISSING_EXCEPTION_MESSAGE);
+        }
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
         return null;
-    }
-
-    /**
-     * Метод возвращает объект-контейнер {@code Authentication},
-     * <br/>
-     * Содержащий объект {@code User}, а так же набор ролей
-     *
-     * @param token JWT-токен
-     * @return {@code Authentication} - объект-контейнер, содержащий информацию для авторизации
-     *
-     * @throws UserNotFoundException
-     * @throws TokenValidationException
-     */
-    public Authentication getAuthentication(String token) throws TokenValidationException, UserNotFoundException {
-        var userOptional = validateTokenAndReturnOptionalOfUser(token);
-        if(userOptional.isPresent()) {
-            var user = userOptional.get();
-            return new UsernamePasswordAuthenticationToken(user, "", List.of(user.getUserRole()));
-        }
-        throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
     }
 
     private boolean isTokenExpired(String token) {

@@ -60,9 +60,7 @@ public class UsersService implements UserService<UserDto, User> {
     }
 
     @Override
-    public MessageDto delete()
-            throws UserNotFoundException,
-            DatabaseOperationException {
+    public MessageDto delete() throws UserNotFoundException {
 
         long userId = getUserIdFromSecurityContext();
         try {

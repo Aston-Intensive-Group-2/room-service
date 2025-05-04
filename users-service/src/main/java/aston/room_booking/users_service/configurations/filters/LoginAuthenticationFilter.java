@@ -1,12 +1,15 @@
-package aston.room_booking.users_service.configurations;
+package aston.room_booking.users_service.configurations.filters;
 
 import aston.room_booking.users_service.components.JwtTokenProvider;
+import aston.room_booking.users_service.configurations.CustomAuthenticationManager;
+import aston.room_booking.users_service.configurations.SecurityFilterChainConfig;
 import aston.room_booking.users_service.models.dtos.TokenDto;
 import aston.room_booking.users_service.models.entities.User;
 import aston.room_booking.users_service.repositories.interfaces.UserRepository;
 import aston.room_booking.users_service.utils.StaticConstants;
 import aston.room_booking.users_service.utils.exceptions.AuthorizationException;
 
+import aston.room_booking.users_service.utils.exceptions.InvalidUsernameOrPasswordException;
 import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -36,7 +39,7 @@ import java.util.Date;
  */
 @Slf4j
 @Configuration
-public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final UserRepository userRepository;
     private final CustomAuthenticationManager authenticationManager;
@@ -50,7 +53,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
      * @param jwtTokenProvider
      * @param authenticationManager
      */
-    public  AuthenticationFilter(
+    public LoginAuthenticationFilter(
             JwtTokenProvider jwtTokenProvider,
             CustomAuthenticationManager authenticationManager,
             UserRepository userRepository
@@ -64,12 +67,14 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     /**
-     * Метод вызывается из {@link SecurityFilterChainConfig#filterChain(HttpSecurity)} как фильтр для перехвата {@code email} и {@code password};
+     * Метод вызывается из {@link SecurityFilterChainConfig#filterChain(HttpSecurity)}
+     * <br/>
+     * как фильтр для перехвата {@code email} и {@code password};
      * <p>
      *     метод:
      * <ul>
      *   <li>Извлекает {@code email} и {@code password} из переданного в качестве параметра объекта {@code Authentication};</li>
-     *   <li>отправляет токен на валидацию;</li>
+     *   <li>отправляет их на верификацию;</li>
      *   <li>В случае успешной валидации: получает объект {@code user};</li>
      *   <li>Создаёт объект-контейнер {@code UsernamePasswordAuthenticationToken}, содержащий {@code password} и {@code user};</li>
      * </ul>
@@ -126,16 +131,22 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             return user.get();
         } else {
             log.error(StaticConstants.INVALID_USERNAME_OR_PASSWORD_EXCEPTION_MESSAGE);
-            throw new AuthorizationException(StaticConstants.INVALID_USERNAME_OR_PASSWORD_EXCEPTION_MESSAGE);
+            throw new InvalidUsernameOrPasswordException(StaticConstants.INVALID_USERNAME_OR_PASSWORD_EXCEPTION_MESSAGE);
         }
     }
 
     /**
-     * Метод вызывается механизмом Spring-Security после {@link AuthenticationFilter#attemptAuthentication(HttpServletRequest, HttpServletResponse)}
+     * Финальный Метод аутенфикации по логину и паролю;
      * <br/>
-     * в случае успешного прохождения завершения предыдущего метода.
+     * вызывается механизмом Spring-Security
      * <br/>
-     * Генерируется токен и возвращается {@code json} ответа
+     * после успешной верификации {@code email} и {@code password}
+     * <br/>
+     * и нахождения в базе данных соответствующего пользователя
+     * <br/>
+     * Запрашивается генерация токена и возвращается {@code json} ответа
+     * <br/>
+     * Так же токен добавляется в заголовок авторизации
      *
      * @param request
      * @param response
@@ -148,7 +159,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public void successfulAuthentication(HttpServletRequest request,
                                          HttpServletResponse response,
                                          FilterChain chain,
-                                         Authentication authResult) throws IOException {
+                                         Authentication authResult) throws IOException{
 
         User user = (User) authResult.getPrincipal();
         String token = jwtTokenProvider.createToken(user);
@@ -160,5 +171,23 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         response.addHeader("Authorization", "Bearer " + token);
         response.setContentType("application/json");
         response.getWriter().write(jsonResponse);
+    }
+
+    /**
+     * Метод передаёт упраление фильтру-перехватчику исключений
+     * <br/>
+     * в случае выброса исключения в процессе аутенфикации
+     *
+     * @param request
+     * @param response
+     * @param failed
+     * @throws IOException
+     */
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+                                              HttpServletResponse response,
+                                              AuthenticationException failed) throws IOException {
+
+        throw failed;
     }
 }

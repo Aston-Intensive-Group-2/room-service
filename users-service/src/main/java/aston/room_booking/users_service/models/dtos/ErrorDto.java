@@ -8,6 +8,5 @@ package aston.room_booking.users_service.models.dtos;
 public record ErrorDto(
         String dateTime,
         int statusCode,
-        //String path,
         String message) {
 }

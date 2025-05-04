@@ -6,6 +6,7 @@ import aston.room_booking.users_service.models.entities.User;
 import aston.room_booking.users_service.services.interfaces.AdminService;
 import aston.room_booking.users_service.utils.StaticConstants;
 
+import aston.room_booking.users_service.utils.exceptions.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * @author 4ndr33w
@@ -30,7 +32,11 @@ public class AdminsController implements AdminController {
     @Override
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> getAll(@RequestHeader(value = "Authorization") String authorizationHeader) {
+    public ResponseEntity<?> getAll()
+            throws NoUsersFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException {
+
         Collection<UserDto> users = adminService.getAll();
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
@@ -38,34 +44,35 @@ public class AdminsController implements AdminController {
     @Override
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?>  getById(
-            @RequestHeader(value = "Authorization") String authorizationHeader,
-            @PathVariable long id) {
+    public ResponseEntity<?> getById(@PathVariable long id)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException {
 
+        Objects.requireNonNull(id);
         var result = adminService.getById(id);
-
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @Override
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> deletById(
-            @RequestHeader(value = "Authorization") String authorizationHeader,
-            @PathVariable long id) {
+    public ResponseEntity<?> deletById(@PathVariable long id)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException {
 
         var result = adminService.deleteById(id);
-
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @Override
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> updateById(
-            @RequestHeader(value = "Authorization") String authorizationHeader,
-            @PathVariable long id,
-            @RequestBody User user) {
+    public ResponseEntity<?> updateById( @PathVariable long id, @RequestBody User user)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException {
 
         var result = adminService.update(id, user);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
@@ -74,9 +81,10 @@ public class AdminsController implements AdminController {
     @Override
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> create(
-            @RequestHeader(value = "Authorization") String authorizationHeader,
-                                    @RequestBody User user) {
+    public ResponseEntity<?> create(@RequestBody User user)
+            throws EmailAlreadyUseException,
+            DatabaseOperationException,
+            ErrorFetchingUserDataException{
 
         var newUser = adminService.create(user);
         if(newUser != null) {

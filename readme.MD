@@ -35,8 +35,8 @@ http://localhost:8091/api/v1/users<br>
 Контроллер пользователей
 <hr/>
 
-http://localhost:8080/api/v1/admins<br>
-http://localhost:8091/api/v1/admins<br>
+http://localhost:8080/api/v1/admin<br>
+http://localhost:8091/api/v1/admin<br>
 Административный контролер
 <hr/>
 

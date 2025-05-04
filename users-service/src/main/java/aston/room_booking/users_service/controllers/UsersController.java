@@ -23,16 +23,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/users")
 public class UsersController implements UserController {
 
-private final AdminService adminService;
 private final UserService userService;
 
     @Override
     @PostMapping
-    public ResponseEntity<?> create (@RequestBody User user) throws EmailAlreadyUseException, DatabaseOperationException, ArgumentIsNullException, ErrorFetchingUserDataException {
-        if(user == null) {
-            log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
-            throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
-        }
+    public ResponseEntity<?> create (@RequestBody User user)
+            throws EmailAlreadyUseException,
+            DatabaseOperationException,
+            ErrorFetchingUserDataException {
+
         var newUser = userService.create(user);
         if(newUser != null) {
             return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
@@ -42,7 +41,10 @@ private final UserService userService;
 
     @Override
     @GetMapping
-    public ResponseEntity<?> get (@RequestHeader(value = "Authorization") String authorizationHeader) throws UserNotFoundException, ErrorFetchingUserDataException, TokenValidationException, DatabaseOperationException {
+    public ResponseEntity<?> get ()
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException {
 
         var userDto = userService.get();
         if(userDto != null) {
@@ -55,7 +57,10 @@ private final UserService userService;
 
     @Override
     @DeleteMapping
-    public ResponseEntity<?> delete (@RequestHeader(value = "Authorization") String authorizationHeader) throws UserNotFoundException, TokenValidationException, DatabaseOperationException {
+    public ResponseEntity<?> delete ()
+            throws UserNotFoundException,
+            TokenValidationException,
+            DatabaseOperationException {
 
         var result = userService.delete();
         return ResponseEntity.status(HttpStatus.OK).body(result);
@@ -63,7 +68,10 @@ private final UserService userService;
 
     @Override
     @PutMapping
-    public ResponseEntity<?> update (@RequestHeader(value = "Authorization") String authorizationHeader, @RequestBody User user) throws UserNotFoundException, TokenValidationException, ArgumentIsNullException, ErrorFetchingUserDataException, DatabaseOperationException {
+    public ResponseEntity<?> update (@RequestBody User user)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException {
 
         var result = userService.update(user);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
@@ -71,12 +79,18 @@ private final UserService userService;
 
 
     @Override
-    public ResponseEntity<?> changeEmail(@RequestBody String newEmail) {
+    public ResponseEntity<?> changeEmail(@RequestBody String newEmail)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException {
         return ResponseEntity.status(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED).body(false);
     }
 
     @Override
-    public ResponseEntity<?> changePassword(@RequestBody String newPassword) {
+    public ResponseEntity<?> changePassword(@RequestBody String newPassword)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            DatabaseOperationException {
         return ResponseEntity.status(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED).body(false);
     }
 }
