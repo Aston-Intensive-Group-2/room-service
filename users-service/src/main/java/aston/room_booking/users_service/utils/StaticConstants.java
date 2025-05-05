@@ -26,6 +26,7 @@ public class StaticConstants {
 
     public static final String USER_ALREADY_EXISTS_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("USER_ALREADY_EXISTS_EXCEPTION_MESSAGE");
     public static final String USERNAME_IS_ALREADY_IN_USE_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("USERNAME_IS_ALREADY_IN_USE_EXCEPTION_MESSAGE");
+    public static final String INVALID_ARGUMENT_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("INVALID_ARGUMENT_EXCEPTION_MESSAGE");
 
     public static final String ARGUMENT_IS_NULL_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("ARGUMENT_IS_NULL_EXCEPTION_MESSAGE");
     public static final String JWT_VERIFICATION_EXCEPTION = PropertiesConfiguration.getConstants().getProperty("JWT_VERIFICATION_EXCEPTION");
@@ -35,13 +36,12 @@ public class StaticConstants {
     public static final String UNEXPECTED_ERROR_MESSAGE = PropertiesConfiguration.getConstants().getProperty("UNEXPECTED_ERROR_MESSAGE");
     public static final String FORBIDDEN_OPERATION_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("FORBIDDEN_OPERATION_EXCEPTION_MESSAGE");
     public static final String AUTHENTICATION_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("AUTHENTICATION_EXCEPTION_MESSAGE");
+    public static final String ACCESS_DENIED_MESSAGE = PropertiesConfiguration.getConstants().getProperty("ACCESS_DENIED_MESSAGE");
 
     public static final String UNABLE_TO_FETCH_USER_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("UNABLE_TO_FETCH_USER_EXCEPTION_MESSAGE");
     public static final String UNABLE_TO_DELETE_USER_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("UNABLE_TO_DELETE_USER_EXCEPTION_MESSAGE");
     public static final String UNABLE_TO_UPDATE_USER_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("UNABLE_TO_UPDATE_USER_EXCEPTION_MESSAGE");
     public static final String UNABLE_TO_CREATE_NEW_USER = PropertiesConfiguration.getConstants().getProperty("UNABLE_TO_CREATE_NEW_USER");
-
-
 
     public static final String SALT_KEY = PropertiesConfiguration.getConstants().getProperty("SALT_KEY");
     public static final String JWT_ISSUER = PropertiesConfiguration.getConstants().getProperty("JWT_ISSUER");

@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS users
 );
 
 /*
-CREATE IF NOT EXISTS FUNCTION update_users_timestamp()
+CREATE OR REPLACE FUNCTION update_users_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated = NOW();

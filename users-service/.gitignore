@@ -8,6 +8,8 @@ backup/
 !**/src/main/**/target/
 !**/src/test/**/target/
 test-service/
+tests-service/
+
 
 ### STS ###
 .apt_generated

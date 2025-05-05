@@ -10,6 +10,7 @@ import aston.room_booking.users_service.utils.PasswordHash;
 import aston.room_booking.users_service.utils.StaticConstants;
 import aston.room_booking.users_service.utils.exceptions.*;
 import aston.room_booking.users_service.utils.mappers.UserMapper;
+import aston.room_booking.users_service.utils.mappers.UserUpdater;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +22,7 @@ import java.util.Date;
  * <p>
  *     Содержит операции по редактированию пользователем своего профиля
  *     <br/>
- *     на успешной аутенфикации по JWT-токену
+ *     при успешной аутенфикации по JWT-токену
  * </p>
  *
  * @version 1.0
@@ -39,6 +40,7 @@ public class UsersService implements UserService<UserDto, User> {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordHash passwordHash;
+    private final UserUpdater userUpdater;
 
     @Override
     public UserDto get()
@@ -86,6 +88,17 @@ public class UsersService implements UserService<UserDto, User> {
         user.setPassword(hashedPassword);
         user.setUserRole(UserRole.USER);
 
+        //------------------------------------------------------------------
+        // Выяснилось, что при создании нового пользователя
+        // и добавлении в json поля "id"
+        // обновляется существующий пользователь с указанным "id"
+        // Таки образом можно изменить у существующего пользователя:
+        // email; username; пароль; и задать роль USER (даже если он был ADMIN)
+        // Так как в этом методе этого контроллера
+        // всем принудительно ставитьс роль USER
+        user.setId(null);
+        //------------------------------------------------------------------
+
         try {
             return userMapper.toDto(userRepository.save(user));
         }
@@ -98,21 +111,15 @@ public class UsersService implements UserService<UserDto, User> {
     @Override
     public UserDto update(User updatingUser)
             throws ArgumentIsNullException,
-            ErrorFetchingUserDataException,
-            DatabaseOperationException {
+            ErrorFetchingUserDataException{
 
         if(updatingUser == null) {
             log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
             throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
         }
-        try {
-            var updatedUser = getUpdatedUser(updatingUser);
-            var result = userRepository.save(updatedUser);
-            return userMapper.toDto(result);
-        }
-        catch (Exception e) {
-            throw new DatabaseOperationException(StaticConstants.UNABLE_TO_UPDATE_USER_EXCEPTION_MESSAGE, e);
-        }
+        var updatedUser = userUpdater.simpleUserUpdate(updatingUser);
+        var result = userRepository.save(updatedUser);
+        return userMapper.toDto(result);
     }
 
     private long getUserIdFromSecurityContext() {
@@ -120,26 +127,4 @@ public class UsersService implements UserService<UserDto, User> {
         var user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return user.getId();
     }
-
-    private User getUserFromSecurityContext() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
-    private User getUpdatedUser(User userDto) {
-
-        var existingUser = getUserFromSecurityContext();
-
-        String newFirstName =  userDto.getFirstName() == null? existingUser.getFirstName() : userDto.getFirstName();
-        String newLastName = userDto.getLastName() == null? existingUser.getLastName() : userDto.getLastName();
-        String newPhone = userDto.getPhone() == null? existingUser.getPhone() : userDto.getPhone();
-        byte[] newImage = userDto.getImage() == null? existingUser.getImage() : userDto.getImage();
-
-        existingUser.setFirstName(newFirstName);
-        existingUser.setLastName(newLastName);
-        existingUser.setPhone(newPhone);
-        existingUser.setImage(newImage);
-
-        return existingUser;
-    }
-
 }

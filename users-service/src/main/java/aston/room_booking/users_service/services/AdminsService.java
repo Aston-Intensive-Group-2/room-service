@@ -3,13 +3,17 @@ package aston.room_booking.users_service.services;
 import aston.room_booking.users_service.models.dtos.MessageDto;
 import aston.room_booking.users_service.models.dtos.UserDto;
 import aston.room_booking.users_service.models.entities.User;
-import aston.room_booking.users_service.models.enums.UserRole;
 import aston.room_booking.users_service.repositories.interfaces.UserRepository;
 import aston.room_booking.users_service.services.interfaces.AdminService;
 import aston.room_booking.users_service.utils.PasswordHash;
 import aston.room_booking.users_service.utils.StaticConstants;
 import aston.room_booking.users_service.utils.exceptions.*;
 import aston.room_booking.users_service.utils.mappers.UserMapper;
+import aston.room_booking.users_service.utils.mappers.UserUpdater;
+
+
+
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +44,7 @@ public class AdminsService implements AdminService<UserDto, User> {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordHash passwordHash;
+    private final UserUpdater userUpdater;
 
     @Override
     public UserDto create(User user)
@@ -54,6 +59,16 @@ public class AdminsService implements AdminService<UserDto, User> {
 
         String hashedPassword = passwordHash.createHash(user.getPassword());
         user.setPassword(hashedPassword);
+        user.setEmail(user.getEmail().toLowerCase());
+
+        //------------------------------------------------------------------
+        // Выяснилось, что при создании нового пользователя
+        // и добавлении в json поля "id"
+        // обновляется существующий пользователь с указанным "id"
+        // Таки образом можно изменить у существующего пользователя:
+        // email; username и пароль
+        user.setId(null);
+        //------------------------------------------------------------------
 
         try {
             return userMapper.toDto(userRepository.save(user));
@@ -66,15 +81,17 @@ public class AdminsService implements AdminService<UserDto, User> {
 
 
     @Override
-    public Collection<UserDto> getAll() throws NoUsersFoundException, ErrorFetchingUserDataException {
+    public Collection<UserDto> getAll()
+            throws NoUsersFoundException,
+            ErrorFetchingUserDataException {
 
         var users = userRepository.findAll();
         if (!users.isEmpty()) {
             return users.stream().map(userMapper::toDto).toList();
         }
+
         log.warn(StaticConstants.NO_USERS_FOUND_EXCEPTION_MESSAGE);
         throw new NoUsersFoundException(StaticConstants.NO_USERS_FOUND_EXCEPTION_MESSAGE);
-
     }
 
     @Override
@@ -87,7 +104,8 @@ public class AdminsService implements AdminService<UserDto, User> {
             log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
             throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
         }
-        var userOptional = userRepository.findByEmail(email);
+
+        var userOptional = userRepository.findByEmail(email.toLowerCase());
 
         if(userOptional.isEmpty()) {
             log.warn(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
@@ -99,8 +117,12 @@ public class AdminsService implements AdminService<UserDto, User> {
     @Override
     public UserDto getById(long id)
             throws UserNotFoundException,
-            ArgumentIsNullException,
+            InvalidArgumentException,
             ErrorFetchingUserDataException{
+
+        if(id < 0) {
+            throw new InvalidArgumentException(StaticConstants.INVALID_ARGUMENT_EXCEPTION_MESSAGE);
+        }
         var userOptional = userRepository.findById(id);
 
         if(userOptional.isPresent()) {
@@ -115,7 +137,7 @@ public class AdminsService implements AdminService<UserDto, User> {
     @Override
     public MessageDto deleteById(long id)
             throws UserNotFoundException,
-            ArgumentIsNullException,
+            InvalidArgumentException,
             DatabaseOperationException {
 
         var existingUserOptional = userRepository.findById(id);
@@ -135,14 +157,18 @@ public class AdminsService implements AdminService<UserDto, User> {
     }
 
     @Override
-    public UserDto update(long id, User user)
+    public UserDto updateById(long id, User user)
             throws UserNotFoundException,
             ErrorFetchingUserDataException,
+            InvalidArgumentException,
             ArgumentIsNullException,
             DatabaseOperationException {
         if(user == null) {
             log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
             throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
+        }
+        if(id < 0) {
+            throw new InvalidArgumentException(StaticConstants.INVALID_ARGUMENT_EXCEPTION_MESSAGE);
         }
 
         var existingUserOptional = userRepository.findById(id);
@@ -151,36 +177,18 @@ public class AdminsService implements AdminService<UserDto, User> {
             log.warn(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
             throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
         }
-        var existingUser = existingUserOptional.get();
+        try {
+            var existingUser = existingUserOptional.get();
 
-        var updatedUser = getUpdatedUser(user, existingUser);
+            var updatedUser = userUpdater.updateUserWithAdminPrivilegies(user, existingUser);
 
-        var result = userRepository.save(updatedUser);
+            var result = userRepository.save(updatedUser);
 
-        if(result == null) {
-            throw new DatabaseOperationException(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE);
+            return userMapper.toDto(result);
         }
-        return userMapper.toDto(result);
-    }
-
-    private User getUpdatedUser(User updatingData, User existingUser) {
-
-        String newUserName = updatingData.getUsername() == null? existingUser.getUsername() : updatingData.getUsername();
-        String newFirstName =  updatingData.getFirstName() == null? existingUser.getFirstName() : updatingData.getFirstName();
-        String newLastName = updatingData.getLastName() == null? existingUser.getLastName() : updatingData.getLastName();
-        String newPhone = updatingData.getPhone() == null? existingUser.getPhone() : updatingData.getPhone();
-        byte[] newImage = updatingData.getImage() == null? existingUser.getImage() : updatingData.getImage();
-        String newEmail = updatingData.getEmail() == null? existingUser.getEmail() : updatingData.getEmail();
-        UserRole newRole = updatingData.getUserRole() == existingUser.getUserRole()? existingUser.getUserRole() : updatingData.getUserRole();
-
-        existingUser.setUserName(newUserName);
-        existingUser.setFirstName(newFirstName);
-        existingUser.setLastName(newLastName);
-        existingUser.setPhone(newPhone);
-        existingUser.setImage(newImage);
-        existingUser.setEmail(newEmail);
-        existingUser.setUserRole(newRole);
-
-        return existingUser;
+        catch (Exception e) {
+            log.error(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE);
+            throw new DatabaseOperationException(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE, e);
+        }
     }
 }

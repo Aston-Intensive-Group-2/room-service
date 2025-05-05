@@ -3,6 +3,7 @@ package aston.room_booking.users_service.controllers.interfaces;
 import aston.room_booking.users_service.models.entities.User;
 import aston.room_booking.users_service.utils.exceptions.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Интерфейс контроллера административных операций над профилями пользователей
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
  * @version 1.0
  * @author 4ndr33w
  */
+@RequestMapping("/api/v1/admin")
 public interface AdminController{
 
     /**
@@ -30,11 +32,14 @@ public interface AdminController{
      *
      * @throws UserNotFoundException Пользователь с указанным {@code id} не найден
      * @throws ErrorFetchingUserDataException Ошибка при парсинге в {@code UserDto}
-     * @throws ArgumentIsNullException Переданный на вход аргумент равен {@code null}
+     * @throws InvalidArgumentException Переданный на вход {@code id} - отрицательный
+     *
+     * @see aston.room_booking.users_service.models.dtos.UserDto
      */
+    @GetMapping("/{id}")
     ResponseEntity<?> getById(long id)
             throws UserNotFoundException,
-            ArgumentIsNullException,
+            InvalidArgumentException,
             ErrorFetchingUserDataException;
 
     /**
@@ -46,11 +51,12 @@ public interface AdminController{
      *
      * @throws UserNotFoundException Пользователь с указанным {@code id} не найден
      * @throws DatabaseOperationException Ошибка при попытке удаления
-     * @throws ArgumentIsNullException Переданный на вход аргумент равен {@code null}
+     * @throws InvalidArgumentException Переданный на вход {@code id} - отрицательный
      */
+    @DeleteMapping("/{id}")
     ResponseEntity<?> deletById (long id)
             throws UserNotFoundException,
-            ArgumentIsNullException,
+            InvalidArgumentException,
             DatabaseOperationException;
 
     /**
@@ -79,13 +85,18 @@ public interface AdminController{
      * @return {@code ResponseEntity<UserDto>}
      *
      * @throws ErrorFetchingUserDataException Ошибка при парсинге в {@code UserDto}
+     * @throws UserNotFoundException Пользователь не найден
      * @throws DatabaseOperationException Ошибка при попытке обновления
-     * @throws ArgumentIsNullException Переданный на вход аргумент равен {@code null}
+     * @throws InvalidArgumentException Переданный на вход {@code id} - отрицательный
+     * @throws ArgumentIsNullException Переданный {@code entity} равен {@code null}
      */
+    @PutMapping("/{id}")
     ResponseEntity<?> updateById(long id, User entity)
             throws DatabaseOperationException,
-            ArgumentIsNullException,
-            ErrorFetchingUserDataException;
+            UserNotFoundException,
+            InvalidArgumentException,
+            ErrorFetchingUserDataException,
+            ArgumentIsNullException;
 
     /**
      * Метод контроллера - возвращает список всех пользователей
@@ -95,6 +106,7 @@ public interface AdminController{
      * @throws ErrorFetchingUserDataException Ошибка при парсинге в {@code UserDto}
      * @throws NoUsersFoundException Не найдено ни одного пользователя, либо список пуст
      */
+    @GetMapping
     ResponseEntity<?> getAll()
             throws NoUsersFoundException,
             ErrorFetchingUserDataException;
@@ -144,6 +156,7 @@ public interface AdminController{
       * @throws DatabaseOperationException Ошибка при попытке создания пользователя
       * @throws ArgumentIsNullException Переданный на вход аргумент равен {@code null}
      */
+     @PostMapping
     ResponseEntity<?> create(User entity)
             throws DatabaseOperationException,
             ArgumentIsNullException,

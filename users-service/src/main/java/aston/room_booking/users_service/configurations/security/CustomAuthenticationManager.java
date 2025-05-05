@@ -1,6 +1,8 @@
 package aston.room_booking.users_service.configurations.security;
 
 import aston.room_booking.users_service.configurations.security.components.JwtTokenProvider;
+import aston.room_booking.users_service.configurations.security.filters.ExceptionHndlerFilter;
+import aston.room_booking.users_service.configurations.security.filters.JwtAuthenticationFilter;
 import aston.room_booking.users_service.configurations.security.filters.LoginAuthenticationFilter;
 import aston.room_booking.users_service.utils.PasswordHash;
 import aston.room_booking.users_service.models.entities.User;
@@ -14,12 +16,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ import java.util.List;
  * @author 4ndr33w
  */
 @Slf4j
-@Configuration
+@Component
 @AllArgsConstructor
 public class CustomAuthenticationManager implements AuthenticationManager {
 
@@ -41,7 +42,7 @@ public class CustomAuthenticationManager implements AuthenticationManager {
      * <br/>
      * {@link LoginAuthenticationFilter#attemptAuthentication(HttpServletRequest, HttpServletResponse)},
      * <br/>
-     * вызываемого в {@link SecurityFilterChainConfig#filterChain(HttpSecurity)};
+     * вызываемого в {@link SecurityFilterChainConfig#filterChain(HttpSecurity, LoginAuthenticationFilter, JwtAuthenticationFilter, ExceptionHndlerFilter)};
      * <p>
      *     Менеджер аутенфикации - метод:
      * <ul>
@@ -110,6 +111,6 @@ public class CustomAuthenticationManager implements AuthenticationManager {
             var user = userOptional.get();
             return new UsernamePasswordAuthenticationToken(user, "", List.of(user.getUserRole()));
         }
-        throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
+        throw new TokenValidationException(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE);
     }
 }

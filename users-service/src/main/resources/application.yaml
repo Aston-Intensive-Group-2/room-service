@@ -35,6 +35,28 @@ logging:
     org.springframework.transaction: INFO
     org.springframework.web: INFO
 
+springdoc:
+  swagger-ui:
+    url: /v3/api-docs
+    path: /swagger-ui/index.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    #config-url: /v3/api-docs/swagger-config
+    layout: StandaloneLayout
+    custom-js: /swagger-ui-init.js
+  api-docs:
+    path: /v3/api-docs
+
+rooms:
+  server:
+    url: http://${ROOMS_SERVICE_HOST:localhost}:${ROOMS_SERVICE_PORT:8093}
+    path: /api/v1/rooms
+
+users:
+  server:
+    url: http://localhost:${USERS_SERVICE_PORT:8091}
+    path: /api/v1/users
+
 #environment:
   #- SPRING_LIQUIBASE_CHANGELOG=classpath:/db/changelog/db.changelog-master.yaml
   #- SPRING_LIQUIBASE_CONTEXTS=default

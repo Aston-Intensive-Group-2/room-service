@@ -4,6 +4,7 @@ import aston.room_booking.users_service.models.entities.User;
 
 import aston.room_booking.users_service.utils.exceptions.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Интерфейс контроллера пользовательских операций
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
  * @version 1.0
  * @author 4ndr33w
  */
+@RequestMapping("/api/v1/users")
 public interface UserController {
 
     /**
@@ -53,15 +55,16 @@ public interface UserController {
      * }</pre>
      * </p>
      *
-     * @param entity
+     * @param entity модель объекта пользователя
      *
-     * @return {@code ResponseEntity<UserDto>}
+     * @return {@code ResponseEntity<UserDto>} - Ответ, содержащий {@code UserDto}
      *
      * @throws ErrorFetchingUserDataException Ошибка при парсинге в {@code UserDto}
      * @throws DatabaseOperationException Ошибка при попытке создания пользователя
      * @throws ArgumentIsNullException Переданный на вход аргумент равен {@code null}
      */
-    ResponseEntity<?> create(User entity)
+    @PostMapping
+    ResponseEntity<?> create(@RequestBody User entity)
             throws DatabaseOperationException,
             ArgumentIsNullException,
             ErrorFetchingUserDataException;
@@ -73,12 +76,13 @@ public interface UserController {
      * <br/>
      * при успешной аутенфикации
      *
-     * @return {@code ResponseEntity<UserDto>}
+     * @return {@code ResponseEntity<UserDto>} - Ответ, содержащий {@code UserDto}
      *
      * @throws UserNotFoundException Пользователь с указанным {@code id} не найден
      * @throws ErrorFetchingUserDataException Ошибка при парсинге в {@code UserDto}
      * @throws ArgumentIsNullException Переданный на вход аргумент равен {@code null}
      */
+    @GetMapping
     ResponseEntity<?> get ()
             throws UserNotFoundException,
             ErrorFetchingUserDataException;
@@ -90,10 +94,11 @@ public interface UserController {
      * <br/>
      * при успешной аутенфикации
      *
-     * @return {@code ResponseEntity<MessageDto>}
+     * @return {@code ResponseEntity<MessageDto>} - Ответ, содержащий {@code MessageDto} об успешном удалении
      *
      * @throws UserNotFoundException Пользователь с указанным {@code id} не найден
      */
+    @DeleteMapping
     ResponseEntity<?> delete ()
             throws UserNotFoundException;
 
@@ -117,23 +122,23 @@ public interface UserController {
      * }</pre>
      * </p>
      *
-     * @param user
+     * @param entity
      *
      * @return {@code ResponseEntity<MessageDto>}
      *
      * @throws UserNotFoundException Пользователь с указанным {@code id} не найден
      */
-    ResponseEntity<?> update (User user)
+    @PutMapping
+    ResponseEntity<?> update (@RequestBody User entity)
             throws ArgumentIsNullException,
-            ErrorFetchingUserDataException,
-            DatabaseOperationException;
+            ErrorFetchingUserDataException;
 
-    ResponseEntity<?> changeEmail (String newEmail)
+    ResponseEntity<?> changeEmail (@RequestBody String newEmail)
             throws UserNotFoundException,
             ErrorFetchingUserDataException,
             DatabaseOperationException;
 
-    ResponseEntity<?> changePassword (String newPassword)
+    ResponseEntity<?> changePassword (@RequestBody String newPassword)
             throws UserNotFoundException,
             ErrorFetchingUserDataException,
             DatabaseOperationException;

@@ -161,7 +161,7 @@ public class JwtTokenProvider {
             log.error(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE);
             throw new TokenValidationException(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE);
         }
-        throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
+        throw new TokenValidationException(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE);
     }
 
     /**

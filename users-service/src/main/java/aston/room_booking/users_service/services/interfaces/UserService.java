@@ -147,6 +147,5 @@ public interface UserService<D, E> {
      */
     D update(E entity)
             throws ArgumentIsNullException,
-            ErrorFetchingUserDataException,
-            DatabaseOperationException;
+            ErrorFetchingUserDataException;
 }
