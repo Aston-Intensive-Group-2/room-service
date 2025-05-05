@@ -1,7 +1,7 @@
-package aston.room_booking.users_service.configurations;
+package aston.room_booking.users_service.configurations.security;
 
-import aston.room_booking.users_service.components.JwtTokenProvider;
-import aston.room_booking.users_service.configurations.filters.LoginAuthenticationFilter;
+import aston.room_booking.users_service.configurations.security.components.JwtTokenProvider;
+import aston.room_booking.users_service.configurations.security.filters.LoginAuthenticationFilter;
 import aston.room_booking.users_service.utils.PasswordHash;
 import aston.room_booking.users_service.models.entities.User;
 import aston.room_booking.users_service.utils.StaticConstants;

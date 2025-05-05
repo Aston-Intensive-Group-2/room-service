@@ -7,6 +7,7 @@ import aston.room_booking.users_service.services.interfaces.AdminService;
 import aston.room_booking.users_service.utils.StaticConstants;
 
 import aston.room_booking.users_service.utils.exceptions.*;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -69,7 +70,7 @@ public class AdminsController implements AdminController {
     @Override
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> updateById( @PathVariable long id, @RequestBody User user)
+    public ResponseEntity<?> updateById(@PathVariable long id, @RequestBody User user)
             throws UserNotFoundException,
             ErrorFetchingUserDataException,
             DatabaseOperationException {
@@ -81,7 +82,7 @@ public class AdminsController implements AdminController {
     @Override
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> create(@RequestBody User user)
+    public ResponseEntity<?> create(@Valid @RequestBody User user)
             throws EmailAlreadyUseException,
             DatabaseOperationException,
             ErrorFetchingUserDataException{

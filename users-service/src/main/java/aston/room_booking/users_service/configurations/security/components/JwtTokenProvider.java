@@ -1,4 +1,4 @@
-package aston.room_booking.users_service.components;
+package aston.room_booking.users_service.configurations.security.components;
 
 import aston.room_booking.users_service.models.entities.User;
 import aston.room_booking.users_service.utils.StaticConstants;

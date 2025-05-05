@@ -1,11 +1,8 @@
-package aston.room_booking.users_service.configurations.filters;
+package aston.room_booking.users_service.configurations.security.filters;
 
-import aston.room_booking.users_service.components.JwtTokenProvider;
+import aston.room_booking.users_service.configurations.security.components.JwtTokenProvider;
 
-import aston.room_booking.users_service.configurations.CustomAuthenticationManager;
-import aston.room_booking.users_service.utils.StaticConstants;
-import aston.room_booking.users_service.utils.exceptions.AuthenticationException;
-import aston.room_booking.users_service.utils.exceptions.TokenValidationException;
+import aston.room_booking.users_service.configurations.security.CustomAuthenticationManager;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

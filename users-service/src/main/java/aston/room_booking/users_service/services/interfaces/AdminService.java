@@ -3,8 +3,6 @@ package aston.room_booking.users_service.services.interfaces;
 import aston.room_booking.users_service.models.dtos.MessageDto;
 import aston.room_booking.users_service.utils.exceptions.*;
 
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 
 /**
@@ -12,8 +10,8 @@ import java.util.Collection;
  * <p>
  *     все операции доступны только при:
  * <ul>
- *   <li> успешной валидации токена</li>
- *   <li> Установления, что обладатель токена имеет роль {@code ADMIN}</li>
+ *   <li> успешной аутенфикации</li>
+ *   <li> авторизации пользователя с ролью {@code ADMIN}</li>
  * </ul>
  * </p>
  * @param <D> DTO пользователя
@@ -39,7 +37,10 @@ public interface AdminService<D, E> {
      *      "password": "123qwerty"
      * }
      * }</pre>
-     * </p>
+     * (поля {@code userName} и {@code email} должны быть уникальными,
+     * <br/>
+     * {@code password} - не пустым)
+      * </p>
      * <p>
      *     Полное заполнение данных:
      * <pre>{@code
@@ -141,14 +142,19 @@ public interface AdminService<D, E> {
     /**
      * Метод обновления данных профиля пользователя
      * <p>
-     *     На вход передаётся {@code D} DTO;
-     *     на выходе {@code D dto}
+     *     На вход передаётся {@code E} entity;
+     *     на выходе {@code D} DTO
      * </p>
      * <p>
-     *     Поля, допустимые к изменению:
+     *     Администратор в праве изменить значение любого поля
+     *     <br/>
+     *     кроме {@code password} и {@code id}
      * <pre>{@code
      * {
+     *      "userName": "Andr33w",
+     *      "email": "Andr33w@examile.ru",
      *      "firstName": "Andrew",
+     *      "userRole": "USER",
      *      "lastName": "McFlyev",
      *      "phone": "1234567890",
      *      "image": null
@@ -157,13 +163,14 @@ public interface AdminService<D, E> {
      * </p>
      *
      * @param id id пользователя
-     * @param {@code D} - DTO пользователя
+     * @param {@code E} - entity пользователя
      *
      * @return {@code D} - DTO
      *
      * @throws UserNotFoundException Пользователь не найден
      * @throws ArgumentIsNullException переданный на вход параметр {@code null}
      * @throws ErrorFetchingUserDataException ошибка парсинга в DTO
+     * @throws DatabaseOperationException ошибка при обращении к БД
      */
     D update(long id, E entity)
             throws UserNotFoundException,

@@ -1,4 +1,4 @@
-package aston.room_booking.users_service.configurations.filters;
+package aston.room_booking.users_service.configurations.security.filters;
 
 import aston.room_booking.users_service.models.dtos.ErrorDto;
 import aston.room_booking.users_service.utils.exceptions.handlers.ExceptionResolver;

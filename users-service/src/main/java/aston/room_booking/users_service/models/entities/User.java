@@ -2,6 +2,10 @@ package aston.room_booking.users_service.models.entities;
 
 import aston.room_booking.users_service.models.enums.UserRole;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +19,7 @@ import java.util.List;
  * @version 1.0
  * @author 4ndr33w
  */
+@Valid
 @Entity
 @Getter
 @Setter
@@ -30,9 +35,12 @@ public class User implements UserDetails {
     private long id;
 
     @Column(name = "user_name", columnDefinition = "text", nullable = false, unique = true)
+    @NotBlank(message = "Поле 'userName' - пустое или имеет некорректное наименование")
     private String userName;
 
     @Column(name = "email", columnDefinition = "text", nullable = false, unique = true)
+    @NotBlank(message = "Поле 'email' - пустое или имеет некорректное наименование")
+    @Email(message = "Некорректный формат email")
     private String email;
 
     @Column(name = "first_name", columnDefinition = "text")
@@ -44,6 +52,8 @@ public class User implements UserDetails {
     private String lastName = null;
 
     @Column(name = "password", columnDefinition = "text", nullable = false)
+    @NotBlank(message = "Поле 'password' - пустое или имеет некорректное наименование")
+    @Size(min = 3, message = "Пароль должен содержать минимум 3 символа")
     private String password;
 
     @Column(name = "phone", columnDefinition = "text")

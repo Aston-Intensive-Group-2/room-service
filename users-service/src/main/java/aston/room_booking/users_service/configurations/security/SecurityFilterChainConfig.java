@@ -1,10 +1,9 @@
-package aston.room_booking.users_service.configurations;
+package aston.room_booking.users_service.configurations.security;
 
-import aston.room_booking.users_service.configurations.filters.ExceptionHndlerFilter;
-import aston.room_booking.users_service.configurations.filters.LoginAuthenticationFilter;
-import aston.room_booking.users_service.configurations.filters.JwtAuthenticationFilter;
+import aston.room_booking.users_service.configurations.security.filters.ExceptionHndlerFilter;
+import aston.room_booking.users_service.configurations.security.filters.LoginAuthenticationFilter;
+import aston.room_booking.users_service.configurations.security.filters.JwtAuthenticationFilter;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

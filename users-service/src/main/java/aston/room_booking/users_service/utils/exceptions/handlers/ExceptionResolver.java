@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import java.io.IOException;
@@ -44,12 +47,8 @@ public class ExceptionResolver {
      */
     public ErrorDto handleException(Exception exception) {
 
-        var cause = exception.getCause();
+        var cause = exception.getCause();//getRootCause(exception);
         String message = exception.getMessage();
-        if(cause != null) {
-            message = cause.getMessage();
-            exception = (Exception)exception.getCause();
-        }
 
         int statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
@@ -62,6 +61,15 @@ public class ExceptionResolver {
         if (exception instanceof ArgumentIsNullException) {
 
             message = StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE;
+            statusCode = HttpServletResponse.SC_BAD_REQUEST;
+        }
+        if(exception instanceof MethodArgumentNotValidException) {
+            message = ((MethodArgumentNotValidException) exception)
+                    .getBindingResult()
+                    .getAllErrors().stream()
+                    .findFirst()
+                    .map(this::resolveErrorMessage)
+                    .orElse("Validation failed");
             statusCode = HttpServletResponse.SC_BAD_REQUEST;
         }
         if (exception instanceof AuthorizationException) {
@@ -172,5 +180,19 @@ public class ExceptionResolver {
                 new Date().toString(),
                 statusCode,
                 message );
+    }
+/*
+    private Throwable getRootCause(Throwable ex) {
+        Throwable cause = ex;
+        while (cause.getCause() != null && cause.getCause() != cause) {
+            cause = cause.getCause();
+        }
+        return cause;
+    }*/
+    private String resolveErrorMessage(ObjectError error) {
+        if (error instanceof FieldError fieldError) {
+            return fieldError.getDefaultMessage();
+        }
+        return error.getDefaultMessage();
     }
 }

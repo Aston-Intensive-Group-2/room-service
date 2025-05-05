@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @version 1.0
  * @author 4ndr33w
  */
-@ResponseStatus(value = HttpStatus.FAILED_DEPENDENCY)
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 public class JwtException extends RuntimeException {
   public JwtException(String message) {
     super(message);

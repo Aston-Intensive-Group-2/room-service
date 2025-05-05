@@ -1,8 +1,8 @@
-package aston.room_booking.users_service.configurations.filters;
+package aston.room_booking.users_service.configurations.security.filters;
 
-import aston.room_booking.users_service.components.JwtTokenProvider;
-import aston.room_booking.users_service.configurations.CustomAuthenticationManager;
-import aston.room_booking.users_service.configurations.SecurityFilterChainConfig;
+import aston.room_booking.users_service.configurations.security.components.JwtTokenProvider;
+import aston.room_booking.users_service.configurations.security.CustomAuthenticationManager;
+import aston.room_booking.users_service.configurations.security.SecurityFilterChainConfig;
 import aston.room_booking.users_service.models.dtos.TokenDto;
 import aston.room_booking.users_service.models.entities.User;
 import aston.room_booking.users_service.repositories.interfaces.UserRepository;

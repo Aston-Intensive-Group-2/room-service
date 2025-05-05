@@ -1,6 +1,5 @@
 package aston.room_booking.users_service.services;
 
-import aston.room_booking.users_service.components.JwtTokenProvider;
 import aston.room_booking.users_service.models.dtos.MessageDto;
 import aston.room_booking.users_service.models.dtos.UserDto;
 import aston.room_booking.users_service.models.entities.User;
