@@ -109,7 +109,6 @@ public class JwtTokenProvider {
      *     метод:
      * <ul>
      *   <li>извлекает {@code email} из токена</li>
-     *   <li>проверяет,существует ли пользователь с таким {@code email}</li>
      *   <li>проверяет срок истечения действия токена</li>
      * </ul>
      * </p>
@@ -123,10 +122,7 @@ public class JwtTokenProvider {
         try {
             final String userName = getUserNameFromToken(token);
 
-            if(userName != null && !isTokenExpired(token)) {
-                return true;
-            }
-            return true;
+            return userName != null && !isTokenExpired(token);
         } catch (JWTVerificationException exception) {
 
             log.error(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE);
