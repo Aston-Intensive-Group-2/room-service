@@ -25,6 +25,7 @@ public class StaticConstants {
     public static final String BAD_REQUEST_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("BAD_REQUEST_EXCEPTION_MESSAGE");
 
     public static final String USER_ALREADY_EXISTS_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("USER_ALREADY_EXISTS_EXCEPTION_MESSAGE");
+    public static final String USERNAME_IS_ALREADY_IN_USE_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("USERNAME_IS_ALREADY_IN_USE_EXCEPTION_MESSAGE");
 
     public static final String ARGUMENT_IS_NULL_EXCEPTION_MESSAGE = PropertiesConfiguration.getConstants().getProperty("ARGUMENT_IS_NULL_EXCEPTION_MESSAGE");
     public static final String JWT_VERIFICATION_EXCEPTION = PropertiesConfiguration.getConstants().getProperty("JWT_VERIFICATION_EXCEPTION");

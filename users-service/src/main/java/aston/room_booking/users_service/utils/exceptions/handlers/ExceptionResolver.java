@@ -70,6 +70,7 @@ public class ExceptionResolver {
                     .findFirst()
                     .map(this::resolveErrorMessage)
                     .orElse("Validation failed");
+
             statusCode = HttpServletResponse.SC_BAD_REQUEST;
         }
         if (exception instanceof AuthorizationException) {
@@ -86,9 +87,15 @@ public class ExceptionResolver {
         }
         if (exception instanceof DatabaseOperationException) {
 
-            if (message.contains("duplicate key")) {
-                message = StaticConstants.USER_ALREADY_EXISTS_EXCEPTION_MESSAGE;
-                statusCode = HttpServletResponse.SC_BAD_REQUEST;
+            if (message.contains("duplicate key") || cause.getMessage().contains("duplicate key")) {
+                if (message.contains("Key (user_name)") || cause.getMessage().contains("Key (user_name)")) {
+                    message = StaticConstants.USERNAME_IS_ALREADY_IN_USE_EXCEPTION_MESSAGE;
+                    statusCode = HttpServletResponse.SC_BAD_REQUEST;
+                }
+                else {
+                    message = StaticConstants.EMAIL_IS_ALREADY_IN_USE_EXCEPTION_MESSAGE;
+                    statusCode = HttpServletResponse.SC_BAD_REQUEST;
+                }
             } else {
                 statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
             }

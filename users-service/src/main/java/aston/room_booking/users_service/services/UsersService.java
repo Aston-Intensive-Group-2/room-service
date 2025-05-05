@@ -43,8 +43,7 @@ public class UsersService implements UserService<UserDto, User> {
     @Override
     public UserDto get()
             throws UserNotFoundException,
-            ErrorFetchingUserDataException,
-            DatabaseOperationException {
+            ErrorFetchingUserDataException {
 
         long userId = getUserIdFromSecurityContext();
         var existingUserOptional = userRepository.findById(userId);
@@ -68,23 +67,19 @@ public class UsersService implements UserService<UserDto, User> {
         }
         catch (Exception e) {
             log.warn(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
-            throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
+            throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE, e);
         }
     }
 
     @Override
     public UserDto create(User user)
-            throws EmailAlreadyUseException,
-            DatabaseOperationException,
+            throws DatabaseOperationException,
             ArgumentIsNullException,
             ErrorFetchingUserDataException {
+
         if(user == null) {
             log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
             throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
-        }
-        if(userRepository.findByEmail(user.getEmail()).isPresent()) {
-            log.warn(StaticConstants.EMAIL_IS_ALREADY_IN_USE_EXCEPTION_MESSAGE);
-            throw new EmailAlreadyUseException(StaticConstants.EMAIL_IS_ALREADY_IN_USE_EXCEPTION_MESSAGE);
         }
 
         String hashedPassword = passwordHash.createHash(user.getPassword());
@@ -96,17 +91,20 @@ public class UsersService implements UserService<UserDto, User> {
         }
         catch (Exception e) {
             log.error(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE);
-            throw new DatabaseOperationException(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE);
+            throw new DatabaseOperationException(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE, e);
         }
     }
 
     @Override
     public UserDto update(User updatingUser)
-            throws UserNotFoundException,
-            ArgumentIsNullException,
+            throws ArgumentIsNullException,
             ErrorFetchingUserDataException,
             DatabaseOperationException {
 
+        if(updatingUser == null) {
+            log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
+            throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
+        }
         try {
             var updatedUser = getUpdatedUser(updatingUser);
             var result = userRepository.save(updatedUser);

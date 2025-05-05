@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -36,13 +37,16 @@ public class CustomAuthenticationManager implements AuthenticationManager {
     private final JwtTokenProvider tokenProvider;
 
     /**
-     * Метод вызывается из метода {@link LoginAuthenticationFilter#attemptAuthentication(HttpServletRequest, HttpServletResponse)}, вызываемого механизмом Spring-Securiey;
-     * <br/> туда же (в вызвавший метод) и возвращает результат, который вызывающим методом помещается в контекст безопасности {@link SecurityContextHolder}
+     * Метод вызывается из метода
+     * <br/>
+     * {@link LoginAuthenticationFilter#attemptAuthentication(HttpServletRequest, HttpServletResponse)},
+     * <br/>
+     * вызываемого в {@link SecurityFilterChainConfig#filterChain(HttpSecurity)};
      * <p>
      *     Менеджер аутенфикации - метод:
      * <ul>
      *   <li>Извлекает сущность {@code user} и {@code password} из переданного в качестве параметра объекта {@code Authentication};</li>
-     *   <li>Осуществляет валижацию хэша пароля;</li>
+     *   <li>Осуществляет валидацию хэша пароля;</li>
      *   <li>В случае успешной валидации: создаёт объект {@code UsernamePasswordAuthenticationToken}, в который помещаются {@code user} и список ролей;</li>
      * </ul>
      * </p>

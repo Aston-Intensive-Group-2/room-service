@@ -7,6 +7,7 @@ import aston.room_booking.users_service.utils.exceptions.JwtException;
 import aston.room_booking.users_service.repositories.interfaces.UserRepository;
 import aston.room_booking.users_service.utils.exceptions.TokenValidationException;
 
+import aston.room_booking.users_service.utils.exceptions.UserNotFoundException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -32,7 +33,6 @@ import java.util.stream.Collectors;
  *   <li>Извлечение токена из запроса</li>
  *   <li>Валидацию токена</li>
  *   <li>Извлечение {@code email} из токена</li>
- *   <li>Возвращает контейнер {@code Authentication} , содержащий пользователя и его роли</li>
  * </ul>
  * </p>
  *
@@ -122,7 +122,7 @@ public class JwtTokenProvider {
         try {
             final String userName = getUserNameFromToken(token);
 
-            return userName != null && !isTokenExpired(token);
+            return (userName != null && !isTokenExpired(token));
         } catch (JWTVerificationException exception) {
 
             log.error(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE);
@@ -147,15 +147,21 @@ public class JwtTokenProvider {
      *
      * @throws TokenValidationException в случае, если срок действия токена истёк
      */
-    public Optional<User> validateTokenAndReturnOptionalOfUser(String token) throws TokenValidationException {
-        final String userName = getUserNameFromToken(token);
+    public Optional<User> validateTokenAndReturnOptionalOfUser(String token) throws TokenValidationException, UserNotFoundException {
 
-        var isTokenExpired = isTokenExpired(token);
+        try {
+            var isTokenValid = validateToken(token);
 
-        if(isTokenExpired) {
+            if(isTokenValid) {
+                var email = getUserNameFromToken(token);
+                return userRepository.findByEmail(email);
+            }
+        }
+        catch (Exception e) {
+            log.error(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE);
             throw new TokenValidationException(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE);
         }
-        return userRepository.findByEmail(userName);
+        throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
     }
 
     /**

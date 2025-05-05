@@ -61,14 +61,12 @@ public interface AdminService<D, E> {
      *
      * @return {@code D} - DTO
      *
-     * @throws EmailAlreadyUseException ошибка уникальности email
      * @throws DatabaseOperationException ошибка выполнения операции с базой данных
      * @throws ArgumentIsNullException переданный на вход параметр {@code null}
      * @throws ErrorFetchingUserDataException ошибка парсинга в Dto
      */
     D create(E entity)
-            throws EmailAlreadyUseException,
-            DatabaseOperationException,
+            throws DatabaseOperationException,
             ArgumentIsNullException,
             ErrorFetchingUserDataException;
 
@@ -87,8 +85,7 @@ public interface AdminService<D, E> {
      */
     Collection<D> getAll()
             throws NoUsersFoundException,
-            ErrorFetchingUserDataException,
-            DatabaseOperationException;
+            ErrorFetchingUserDataException;
 
     /**
      * Метод возвращает {@code D} DTO пользователя
@@ -105,8 +102,7 @@ public interface AdminService<D, E> {
     D getByEmail(String email)
             throws UserNotFoundException,
             ErrorFetchingUserDataException,
-            ArgumentIsNullException,
-            DatabaseOperationException;
+            ArgumentIsNullException;
 
     /**
      * Метод возвращает {@code D} DTO пользователя
@@ -121,8 +117,8 @@ public interface AdminService<D, E> {
      */
     D getById( long id)
             throws UserNotFoundException,
-            ErrorFetchingUserDataException,
-            DatabaseOperationException;
+            ArgumentIsNullException,
+            ErrorFetchingUserDataException;
 
     /**
      * Метод удаляет пользователя
@@ -133,10 +129,11 @@ public interface AdminService<D, E> {
      * @return {@code boolean}
      *
      * @throws UserNotFoundException Пользователь с указанным {@code id} не найден
+     * @throws DatabaseOperationException Ошибка при удалении пользователя
      */
     MessageDto deleteById(long id)
             throws UserNotFoundException,
-            ErrorFetchingUserDataException,
+            ArgumentIsNullException,
             DatabaseOperationException;
 
     /**

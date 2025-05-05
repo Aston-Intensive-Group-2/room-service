@@ -43,32 +43,27 @@ public class AdminsService implements AdminService<UserDto, User> {
 
     @Override
     public UserDto create(User user)
-            throws EmailAlreadyUseException,
-            DatabaseOperationException,
-            ArgumentIsNullException {
+            throws DatabaseOperationException,
+            ArgumentIsNullException,
+            ErrorFetchingUserDataException {
 
         if(user == null) {
             log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
             throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
         }
-        if(userRepository.findByEmail(user.getEmail()).isPresent()) {
-            log.warn(StaticConstants.EMAIL_IS_ALREADY_IN_USE_EXCEPTION_MESSAGE);
-            throw new EmailAlreadyUseException(StaticConstants.EMAIL_IS_ALREADY_IN_USE_EXCEPTION_MESSAGE);
-        }
 
         String hashedPassword = passwordHash.createHash(user.getPassword());
         user.setPassword(hashedPassword);
 
-        var savedUser = userRepository.save(user);
-
-        if(savedUser != null) {
-            return userMapper.toDto(user);
+        try {
+            return userMapper.toDto(userRepository.save(user));
         }
-        else {
+        catch (Exception e) {
             log.error(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE);
-            throw new DatabaseOperationException(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE);
+            throw new DatabaseOperationException(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE, e);
         }
     }
+
 
     @Override
     public Collection<UserDto> getAll() throws NoUsersFoundException, ErrorFetchingUserDataException {
@@ -83,7 +78,10 @@ public class AdminsService implements AdminService<UserDto, User> {
     }
 
     @Override
-    public UserDto getByEmail(String email) throws UserNotFoundException, ErrorFetchingUserDataException, ArgumentIsNullException {
+    public UserDto getByEmail(String email)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            ArgumentIsNullException {
 
         if(email == null) {
             log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
@@ -99,7 +97,10 @@ public class AdminsService implements AdminService<UserDto, User> {
     }
 
     @Override
-    public UserDto getById(long id) {
+    public UserDto getById(long id)
+            throws UserNotFoundException,
+            ArgumentIsNullException,
+            ErrorFetchingUserDataException{
         var userOptional = userRepository.findById(id);
 
         if(userOptional.isPresent()) {
@@ -114,6 +115,7 @@ public class AdminsService implements AdminService<UserDto, User> {
     @Override
     public MessageDto deleteById(long id)
             throws UserNotFoundException,
+            ArgumentIsNullException,
             DatabaseOperationException {
 
         var existingUserOptional = userRepository.findById(id);
@@ -133,7 +135,11 @@ public class AdminsService implements AdminService<UserDto, User> {
     }
 
     @Override
-    public UserDto update(long id, User user) throws UserNotFoundException, ErrorFetchingUserDataException, ArgumentIsNullException {
+    public UserDto update(long id, User user)
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException,
+            ArgumentIsNullException,
+            DatabaseOperationException {
         if(user == null) {
             log.warn(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);
             throw new ArgumentIsNullException(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE);

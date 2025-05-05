@@ -35,8 +35,7 @@ public class AdminsController implements AdminController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getAll()
             throws NoUsersFoundException,
-            ErrorFetchingUserDataException,
-            DatabaseOperationException {
+            ErrorFetchingUserDataException {
 
         Collection<UserDto> users = adminService.getAll();
         return ResponseEntity.status(HttpStatus.OK).body(users);
@@ -47,8 +46,7 @@ public class AdminsController implements AdminController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getById(@PathVariable long id)
             throws UserNotFoundException,
-            ErrorFetchingUserDataException,
-            DatabaseOperationException {
+            ErrorFetchingUserDataException {
 
         Objects.requireNonNull(id);
         var result = adminService.getById(id);
@@ -60,7 +58,6 @@ public class AdminsController implements AdminController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deletById(@PathVariable long id)
             throws UserNotFoundException,
-            ErrorFetchingUserDataException,
             DatabaseOperationException {
 
         var result = adminService.deleteById(id);
@@ -71,9 +68,9 @@ public class AdminsController implements AdminController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> updateById(@PathVariable long id, @RequestBody User user)
-            throws UserNotFoundException,
-            ErrorFetchingUserDataException,
-            DatabaseOperationException {
+            throws DatabaseOperationException,
+            ArgumentIsNullException,
+            ErrorFetchingUserDataException {
 
         var result = adminService.update(id, user);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
@@ -83,8 +80,8 @@ public class AdminsController implements AdminController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> create(@Valid @RequestBody User user)
-            throws EmailAlreadyUseException,
-            DatabaseOperationException,
+            throws DatabaseOperationException,
+            ArgumentIsNullException,
             ErrorFetchingUserDataException{
 
         var newUser = adminService.create(user);

@@ -1,7 +1,7 @@
 package aston.room_booking.users_service.controllers;
 
-import aston.room_booking.users_service.services.interfaces.AdminService;
 import aston.room_booking.users_service.controllers.interfaces.UserController;
+import aston.room_booking.users_service.models.dtos.MessageDto;
 import aston.room_booking.users_service.models.entities.User;
 import aston.room_booking.users_service.services.interfaces.UserService;
 import aston.room_booking.users_service.utils.StaticConstants;
@@ -11,9 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.validation.annotation.Validated;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 /**
  * @author 4ndr33w
@@ -30,8 +31,8 @@ private final UserService userService;
     @Override
     @PostMapping
     public ResponseEntity<?> create (@Valid @RequestBody User user)
-            throws EmailAlreadyUseException,
-            DatabaseOperationException,
+            throws DatabaseOperationException,
+            ArgumentIsNullException,
             ErrorFetchingUserDataException {
 
         var newUser = userService.create(user);
@@ -45,24 +46,26 @@ private final UserService userService;
     @GetMapping
     public ResponseEntity<?> get ()
             throws UserNotFoundException,
-            ErrorFetchingUserDataException,
-            DatabaseOperationException {
+            ErrorFetchingUserDataException {
 
         var userDto = userService.get();
         if(userDto != null) {
             return ResponseEntity.status(HttpStatus.OK).body(userDto);
         }
         else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(
+                            new MessageDto(
+                                    new Date().toString(),
+                                    StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE));
         }
     }
 
     @Override
     @DeleteMapping
     public ResponseEntity<?> delete ()
-            throws UserNotFoundException,
-            TokenValidationException,
-            DatabaseOperationException {
+            throws UserNotFoundException {
 
         var result = userService.delete();
         return ResponseEntity.status(HttpStatus.OK).body(result);
@@ -71,7 +74,7 @@ private final UserService userService;
     @Override
     @PutMapping
     public ResponseEntity<?> update (@RequestBody User user)
-            throws UserNotFoundException,
+            throws ArgumentIsNullException,
             ErrorFetchingUserDataException,
             DatabaseOperationException {
 
@@ -81,18 +84,28 @@ private final UserService userService;
 
 
     @Override
-    public ResponseEntity<?> changeEmail(@RequestBody String newEmail)
+    public ResponseEntity<?> changeEmail(@Valid @RequestBody String newEmail)
             throws UserNotFoundException,
             ErrorFetchingUserDataException,
             DatabaseOperationException {
-        return ResponseEntity.status(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED).body(false);
+        return ResponseEntity
+                .status(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED)
+                .body(
+                        new MessageDto(
+                                new Date().toString(),
+                                "Метод ещё не реализован"));
     }
 
     @Override
-    public ResponseEntity<?> changePassword(@RequestBody String newPassword)
+    public ResponseEntity<?> changePassword(@Valid @RequestBody String newPassword)
             throws UserNotFoundException,
             ErrorFetchingUserDataException,
             DatabaseOperationException {
-        return ResponseEntity.status(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED).body(false);
+        return ResponseEntity
+                .status(HttpStatus.BANDWIDTH_LIMIT_EXCEEDED)
+                .body(
+                        new MessageDto(
+                                new Date().toString(),
+                                "Метод ещё не реализован"));
     }
 }
