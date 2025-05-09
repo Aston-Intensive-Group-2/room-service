@@ -11,9 +11,6 @@ import aston.room_booking.users_service.utils.exceptions.*;
 import aston.room_booking.users_service.utils.mappers.UserMapper;
 import aston.room_booking.users_service.utils.mappers.UserUpdater;
 
-
-
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -78,7 +75,6 @@ public class AdminsService implements AdminService<UserDto, User> {
             throw new DatabaseOperationException(StaticConstants.DATABASE_ACCESS_EXCEPTION_MESSAGE, e);
         }
     }
-
 
     @Override
     public Collection<UserDto> getAll()

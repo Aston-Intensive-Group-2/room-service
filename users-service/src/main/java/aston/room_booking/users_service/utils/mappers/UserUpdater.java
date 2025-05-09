@@ -6,6 +6,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 /**
+ * Класс для парсинга обновлённых пользовательских данных
+ * Необходимость вынесения логики из сервиса
+ * возникла при написании тестов.
+ * <br/>
+ * Локально (приватным методом в сервисе) не отрабатывал в тестах корректно
+ * и, соответственно, процент покрытия тестами сильно уменьшался
+ *
  * @author 4ndr33w
  * @version 1.0
  */

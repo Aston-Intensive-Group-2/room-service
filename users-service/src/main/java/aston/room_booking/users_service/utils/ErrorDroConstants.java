@@ -1,6 +1,10 @@
 package aston.room_booking.users_service.utils;
 
 /**
+ * Утильный класс для аннотации и разметки Swagger
+ * Предоставляет шаблоны сообщений об ошибках
+ * для Swagger
+ *
  * @author 4ndr33w
  * @version 1.0
  */
