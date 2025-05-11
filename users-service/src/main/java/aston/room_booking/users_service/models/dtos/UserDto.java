@@ -10,6 +10,7 @@ import java.util.Date;
  * @version 1.0
  * @author 4ndr33w
  */
+@Schema(description = "DTO профилья пользователя")
 public record UserDto (
         long id,
         String userName,
@@ -46,7 +47,7 @@ public record UserDto (
     public String phone() {
         return this.phone;
     }
-    @Schema(description = "Роль пользователя", example = "USER")
+    @Schema(description = "Роль пользователя", example = "USER", implementation = UserRole.class)
     public UserRole userRole() {
         return this.userRole;
     }
