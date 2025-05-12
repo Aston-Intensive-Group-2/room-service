@@ -76,7 +76,6 @@ public class SecurityFilterChainConfig implements WebMvcConfigurer {
                                             LoginAuthenticationFilter loginFilter,
                                             JwtAuthenticationFilter jwtFilter,
                                             ExceptionHndlerFilter exceptionFilter) throws Exception {
-
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(withDefaults())
@@ -84,6 +83,8 @@ public class SecurityFilterChainConfig implements WebMvcConfigurer {
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/account/login").permitAll()
+                        .requestMatchers("/api/v1/users/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/v1/users/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(exceptionFilter, LoginAuthenticationFilter.class)

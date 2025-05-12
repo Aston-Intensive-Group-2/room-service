@@ -91,8 +91,14 @@ public class TestUtils {
 
     public void setSecurityContextHolder(User user) {
 
+        //var user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        //return user.getId();
+
         Authentication authentication = mock(Authentication.class);
+
+
         SecurityContext securityContext = mock(SecurityContext.class);
+
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(user);
         SecurityContextHolder.setContext(securityContext);

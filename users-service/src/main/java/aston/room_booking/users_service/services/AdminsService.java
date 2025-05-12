@@ -136,6 +136,10 @@ public class AdminsService implements AdminService<UserDto, User> {
             InvalidArgumentException,
             DatabaseOperationException {
 
+        if(id < 0) {
+            throw new InvalidArgumentException(StaticConstants.INVALID_ARGUMENT_EXCEPTION_MESSAGE);
+        }
+
         var existingUserOptional = userRepository.findById(id);
 
         if(existingUserOptional.isPresent()) {

@@ -110,7 +110,6 @@ public interface UserController {
      *
      * @throws UserNotFoundException Пользователь с указанным {@code id} не найден
      * @throws ErrorFetchingUserDataException Ошибка при парсинге в {@code UserDto}
-     * @throws ArgumentIsNullException Переданный на вход аргумент равен {@code null}
      */
     @GetMapping
     @ApiResponses({

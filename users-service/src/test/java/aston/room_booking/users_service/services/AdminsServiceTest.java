@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.doNothing;
 
 /**
  * Тестовый класс.
@@ -318,8 +319,6 @@ public class AdminsServiceTest extends TestUtils {
         long userId = -1L;
 
         UserDto result = adminsService.getById(userId);
-
-        Mockito.verify(userRepository).findById(userId);
     }
 
     //---------------------------------------------------------------
@@ -374,10 +373,7 @@ public class AdminsServiceTest extends TestUtils {
     public void testDeleteById_NegativeId_throwsException() {
 
         long userId = -1L;
-
-        UserDto result = adminsService.getById(userId);
-
-        Mockito.verify(userRepository).findById(userId);
+        var result = adminsService.deleteById(userId);
     }
 
     //---------------------------------------------------------------
@@ -428,6 +424,7 @@ public class AdminsServiceTest extends TestUtils {
                 .thenReturn(Optional.empty());
 
         adminsService.updateById(Mockito.anyLong(), testUser1);
+        Mockito.verify(userRepository).findById(Mockito.anyLong());
     }
 
     //@Ignore
@@ -454,8 +451,6 @@ public class AdminsServiceTest extends TestUtils {
         long userId = -1L;
 
         UserDto result = adminsService.updateById(userId, testUser1);
-
-        Mockito.verify(userRepository).findById(userId);
     }
 
     //---------------------------------------------------------------

@@ -21,6 +21,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
@@ -61,6 +62,8 @@ public class UsersServiceSets extends TestUtils {
 
         setSecurityContextHolder(testUser1);
 
+        when((SecurityContextHolder.getContext().getAuthentication().getPrincipal())).thenReturn(testUser1);
+
         when(userRepository.findById(testUser1.getId())).thenReturn(Optional.of(testUser1));
         when(userMapper.toDto(testUser1)).thenReturn(testUserDto1);
 
@@ -81,6 +84,8 @@ public class UsersServiceSets extends TestUtils {
 
         setSecurityContextHolder(testUser1);
 
+        when((SecurityContextHolder.getContext().getAuthentication().getPrincipal())).thenReturn(testUser1);
+
         when(userRepository.findById(testUser1.getId()))
                 .thenReturn(Optional.empty());
 
@@ -94,6 +99,7 @@ public class UsersServiceSets extends TestUtils {
     public void testGet_ErrorFetchinToDto_ReturnsException() {
 
         setSecurityContextHolder(testUser1);
+        when((SecurityContextHolder.getContext().getAuthentication().getPrincipal())).thenReturn(testUser1);
 
         when(userRepository.findById(testUser1.getId())).thenReturn(Optional.of(testUser1));
         when(userMapper.toDto(testUser1))
@@ -118,12 +124,15 @@ public class UsersServiceSets extends TestUtils {
     public void testDelete_Success() {
         setSecurityContextHolder(testUser1);
 
+        when((SecurityContextHolder.getContext().getAuthentication().getPrincipal())).thenReturn(testUser1);
+
+        doNothing().when(userRepository).deleteById(testUser1.getId());
         MessageDto result = usersService.delete();
 
         Assert.assertNotNull(result);
         assertTrue(result.message().contains(StaticConstants.SUCCESSFUL_USER_DELETE_MESSAGE));
 
-        Mockito.verify(userRepository).deleteById(Mockito.anyLong());
+        verify(userRepository, times(1)).deleteById(testUser1.getId());
     }
 
     @Test(expected = UserNotFoundException.class)
@@ -131,6 +140,8 @@ public class UsersServiceSets extends TestUtils {
     public void testDelete_UserNotFound() {
 
         setSecurityContextHolder(testUser1);
+
+        when((SecurityContextHolder.getContext().getAuthentication().getPrincipal())).thenReturn(testUser1);
 
         doThrow(new EmptyResultDataAccessException(1))
                 .when(userRepository)
@@ -157,6 +168,8 @@ public class UsersServiceSets extends TestUtils {
     @Test(expected = ArgumentIsNullException.class)
     public void testUpdate_NullUser() {
         setSecurityContextHolder(testUser1);
+
+        //when((SecurityContextHolder.getContext().getAuthentication().getPrincipal())).thenReturn(testUser1);
         try {
             usersService.update(null);
         } catch (ArgumentIsNullException e) {
@@ -168,6 +181,8 @@ public class UsersServiceSets extends TestUtils {
     @Test
     public void testUpdate_Success() {
         setSecurityContextHolder(testUser1);
+
+        //when((SecurityContextHolder.getContext().getAuthentication().getPrincipal())).thenReturn(testUser1);
 
         when(userUpdater.simpleUserUpdate(testUser1)).thenReturn(testUser1);
         when(userRepository.save(testUser1)).thenReturn(testUser1);
@@ -182,6 +197,8 @@ public class UsersServiceSets extends TestUtils {
     @Test(expected = ErrorFetchingUserDataException.class)
     public void testUpdate_ErrorParseToDto() {
         setSecurityContextHolder(testUser1);
+
+        //when((SecurityContextHolder.getContext().getAuthentication().getPrincipal())).thenReturn(testUser1);
 
         when(userUpdater.simpleUserUpdate(testUser1)).thenReturn(testUser1);
         when(userRepository.save(testUser1)).thenReturn(testUser1);
@@ -200,9 +217,11 @@ public class UsersServiceSets extends TestUtils {
     // Create Tests
     //---------------------------------------------------------------
 
+
     @Test(expected = ArgumentIsNullException.class)
     @Description("на вход передаётся null")
     public void testCreate_NullUser_ThrowsException() {
+
         usersService.create(null);
     }
 
@@ -210,24 +229,25 @@ public class UsersServiceSets extends TestUtils {
     @Description("Пользователь успешно создаётся")
     public void testCreate_ValidUser_Success() {
 
-        Mockito.when(passwordHash
-                        .createHash(Mockito.anyString()))
+        Mockito.when(passwordHash.createHash(Mockito.anyString()))
                 .thenReturn(testHashedPassword);
 
-        Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(testUser1);
-        Mockito.when(userMapper.toDto(testUser1)).thenReturn(testUserDto1);
+        Mockito.when(userRepository.save(Mockito.any(User.class)))
+                .thenReturn(testUser1);
+
+        Mockito.when(userMapper.toDto(testUser1))
+                .thenReturn(testUserDto1);
 
         UserDto result = usersService.create(testUser1);
 
         assertEquals(testUserDto1, result);
         assertEquals(testHashedPassword, testUser1.getPassword());
 
-        Mockito.verify(passwordHash)
-                .createHash(testHashedPassword);
-
+        Mockito.verify(passwordHash).createHash(Mockito.anyString());
         Mockito.verify(userRepository).save(testUser1);
         Mockito.verify(userMapper).toDto(testUser1);
     }
+
 
     @Test(expected = DatabaseOperationException.class)
     @Description("Ошибка при обращении к репозиторию")
@@ -246,9 +266,14 @@ public class UsersServiceSets extends TestUtils {
     @Description("Проверка работы хэша пароля")
     public void testCreate_PasswordHash_CalledCorrectly() {
 
-        Mockito.when(passwordHash.createHash(Mockito.anyString())).thenReturn(testHashedPassword);
-        Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(testUser1);
-        Mockito.when(userMapper.toDto(testUser1)).thenReturn(testUserDto1);
+        Mockito.when(passwordHash.createHash(Mockito.anyString()))
+                .thenReturn(testHashedPassword);
+
+        Mockito.when(userRepository.save(Mockito.any(User.class)))
+                .thenReturn(testUser1);
+
+        Mockito.when(userMapper.toDto(testUser1))
+                .thenReturn(testUserDto1);
 
         usersService.create(testUser1);
 

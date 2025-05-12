@@ -37,15 +37,15 @@ logging:
 
 springdoc:
   swagger-ui:
-    url: /v3/api-docs
-    path: /swagger-ui/index.html
+    url: /api/v1/users/v3/api-docs
+    path: /api/v1/users/swagger-ui/index.html
     tags-sorter: alpha
     operations-sorter: alpha
     #config-url: /v3/api-docs/swagger-config
     layout: StandaloneLayout
     custom-js: /swagger-ui-init.js
   api-docs:
-    path: /v3/api-docs
+    path: /api/v1/users/v3/api-docs
 
 rooms:
   server:
