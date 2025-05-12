@@ -7,6 +7,7 @@ backup/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+test-service/
 
 ### STS ###
 .apt_generated
