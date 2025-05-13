@@ -1,11 +1,12 @@
 package aston.room_booking.users_service.configurations.openapi;
 
+import aston.room_booking.users_service.models.enums.UserRole;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.links.Link;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
@@ -14,7 +15,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author 4ndr33w
@@ -62,8 +66,6 @@ public class OpenApiConfiguration {
                 .in(SecurityScheme.In.HEADER)
                 .description("Bearer Token");
 
-        Paths paths = new Paths();
-
         io.swagger.v3.oas.models.links.Link link = new io.swagger.v3.oas.models.links.Link();
         link.setOperationId("login");
 
@@ -79,7 +81,8 @@ public class OpenApiConfiguration {
         return new OpenAPI()
                 .info(info)
                 .servers(List.of(userServer, roomServer))
-                .components(new Components().addSecuritySchemes("bearerAuth", jwtScheme))
+                .components(new Components()
+                        .addSecuritySchemes("bearerAuth", jwtScheme))
                 .addSecurityItem(securityRequirement);
     }
 }

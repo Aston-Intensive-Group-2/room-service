@@ -10,7 +10,7 @@ import java.util.Date;
  * @version 1.0
  * @author 4ndr33w
  */
-@Schema(description = "DTO профилья пользователя")
+@Schema(description = "DTO профиля пользователя")
 public record UserDto (
         long id,
         String userName,
