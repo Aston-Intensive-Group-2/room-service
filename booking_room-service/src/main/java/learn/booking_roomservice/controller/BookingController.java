@@ -4,7 +4,6 @@ import learn.booking_roomservice.clients.UserServerProxy;
 import learn.booking_roomservice.dto.BookingDTO;
 import learn.booking_roomservice.dto.CancelRequestDTO;
 import learn.booking_roomservice.dto.UserDTO;
-import learn.booking_roomservice.model.Booking;
 import learn.booking_roomservice.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/booking")
@@ -22,9 +20,12 @@ public class BookingController {
     private final UserServerProxy userServerProxy;
 
     @GetMapping("/all")
-    public List<Booking> getAll(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<List<BookingDTO>> getAll(@RequestHeader("Authorization") String authHeader) {
         UserDTO user = userServerProxy.get(authHeader).getBody();
-        return bookingService.getAll(user.id());
+        List<BookingDTO> bookings = bookingService.getAll(user.id());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(bookings);
     }
 
     @PostMapping("/create")

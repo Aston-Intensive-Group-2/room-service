@@ -3,14 +3,15 @@ package learn.booking_roomservice.service;
 import learn.booking_roomservice.common.Status;
 import learn.booking_roomservice.dto.BookingDTO;
 import learn.booking_roomservice.exception.BookingNotFoundException;
+import learn.booking_roomservice.exception.BookingsUserNotFoundException;
 import learn.booking_roomservice.exception.TimeBookingRegistrationException;
 import learn.booking_roomservice.mapper.BookingMapper;
-import learn.booking_roomservice.model.Booking;
 import learn.booking_roomservice.repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -22,7 +23,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public void addBooking(BookingDTO bookingDTO) {
         if (isValidRegistration(bookingDTO)) {
-            System.out.println("Valid Registry");
             bookingRepository.save(bookingMapper.toBooking(bookingDTO));
         } else {
             throw new TimeBookingRegistrationException();
@@ -41,16 +41,18 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getAll(Long userId) {
-        return bookingRepository.getAllByUserId(userId);
+    public List<BookingDTO> getAll(Long userId) {
+        return Optional.of(bookingRepository.getAllByUserId(userId))
+                .filter(list -> !list.isEmpty())
+                .orElseThrow(BookingsUserNotFoundException::new)
+                .stream()
+                .map(bookingMapper::toBookingDTO)
+                .toList();
     }
 
     private boolean isValidRegistration(BookingDTO bookingDTO) {
-        List<Booking> listBooking = bookingRepository.getBookingByTime(bookingDTO.roomId(), bookingDTO.start(), bookingDTO.end());
-        listBooking.forEach(System.out::println);
-        if (listBooking.isEmpty()) {
-            return true;
-        }
-        return false;
+        return Optional.ofNullable(
+                        bookingRepository.getBookingByTime(bookingDTO.roomId(), bookingDTO.start(), bookingDTO.end()))
+                .isEmpty();
     }
 }

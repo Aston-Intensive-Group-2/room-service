@@ -1,6 +1,7 @@
 package learn.booking_roomservice.controller;
 
 import learn.booking_roomservice.exception.BookingNotFoundException;
+import learn.booking_roomservice.exception.BookingsUserNotFoundException;
 import learn.booking_roomservice.exception.TimeBookingRegistrationException;
 import learn.booking_roomservice.exception.model.ErrorDetails;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,6 @@ public class ExceptionControllerAdvice {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(error);
-
     }
 
     @ExceptionHandler(BookingNotFoundException.class)
@@ -25,5 +25,12 @@ public class ExceptionControllerAdvice {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(error);
+    }
+
+    @ExceptionHandler(BookingsUserNotFoundException.class)
+    ResponseEntity<ErrorDetails> exceptionBookingsUserNotFound() {
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 }
