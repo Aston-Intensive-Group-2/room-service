@@ -1,6 +1,6 @@
 package learn.booking_roomservice.common;
 
 public enum Status {
-    ACTIVE, CLOSED
+    ACTIVE, CLOSED, CANCELLED
 }
 

@@ -12,10 +12,6 @@ spring:
     username: ${database.username}
     password: ${database.password}
     driver-class-name: org.postgresql.Driver
-#    jpa:
-#      hibernate:
-#        ddl-auto: update
-#      show-sql: true
 
   liquibase:
     url: ${database.url}
@@ -26,3 +22,7 @@ spring:
     contexts: development
     enabled: true
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
