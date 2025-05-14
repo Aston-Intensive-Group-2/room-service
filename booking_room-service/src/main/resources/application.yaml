@@ -1,3 +1,6 @@
+server:
+  port: 8092
+
 database:
   name: booking_db
   username: booking_user
