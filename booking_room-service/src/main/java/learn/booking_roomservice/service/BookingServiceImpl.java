@@ -22,7 +22,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public void addBooking(BookingDTO bookingDTO) {
-        System.out.println(isValidRegistration(bookingDTO));
         if (isValidRegistration(bookingDTO)) {
             bookingRepository.save(bookingMapper.toBooking(bookingDTO));
         } else {
