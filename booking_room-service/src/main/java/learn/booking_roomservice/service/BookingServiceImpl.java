@@ -22,6 +22,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public void addBooking(BookingDTO bookingDTO) {
+        System.out.println(isValidRegistration(bookingDTO));
         if (isValidRegistration(bookingDTO)) {
             bookingRepository.save(bookingMapper.toBooking(bookingDTO));
         } else {
@@ -51,8 +52,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private boolean isValidRegistration(BookingDTO bookingDTO) {
-        return Optional.ofNullable(
-                        bookingRepository.getBookingByTime(bookingDTO.roomId(), bookingDTO.start(), bookingDTO.end()))
-                .isEmpty();
+        return bookingRepository.getBookingByTime(bookingDTO.roomId(), bookingDTO.start(), bookingDTO.end()).isEmpty();
     }
 }

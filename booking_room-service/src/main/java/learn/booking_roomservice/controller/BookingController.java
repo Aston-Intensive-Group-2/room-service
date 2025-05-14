@@ -2,6 +2,7 @@ package learn.booking_roomservice.controller;
 
 import learn.booking_roomservice.clients.UserServerProxy;
 import learn.booking_roomservice.dto.BookingDTO;
+import learn.booking_roomservice.dto.BookingWithUserDTO;
 import learn.booking_roomservice.dto.CancelRequestDTO;
 import learn.booking_roomservice.dto.UserDTO;
 import learn.booking_roomservice.service.BookingService;
@@ -20,9 +21,12 @@ public class BookingController {
     private final UserServerProxy userServerProxy;
 
     @GetMapping("/all")
-    public ResponseEntity<List<BookingDTO>> getAll(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<List<BookingWithUserDTO>> getAll(@RequestHeader("Authorization") String authHeader) {
         UserDTO user = userServerProxy.get(authHeader).getBody();
-        List<BookingDTO> bookings = bookingService.getAll(user.id());
+        List<BookingWithUserDTO> bookings = bookingService.getAll(user.id())
+                .stream()
+                .map(b -> new BookingWithUserDTO(b.id(), user, b.roomId(), b.start(), b.end(), b.status(), b.createdAt()))
+                .toList();
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(bookings);
