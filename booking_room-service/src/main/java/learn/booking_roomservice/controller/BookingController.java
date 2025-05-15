@@ -1,5 +1,10 @@
 package learn.booking_roomservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import learn.booking_roomservice.clients.UserServerProxy;
 import learn.booking_roomservice.dto.BookingDTO;
 import learn.booking_roomservice.dto.BookingWithUserDTO;
@@ -13,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Бронирование", description = "Операции для управления бронированиями")
 @RestController
 @RequestMapping("/booking")
 @RequiredArgsConstructor
@@ -20,6 +26,14 @@ public class BookingController {
     private final BookingService bookingService;
     private final UserServerProxy userServerProxy;
 
+    @Operation(
+            summary = "Получить все бронирования пользователя",
+            description = "Возвращает список бронирований пользователя"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Успешно получены бронирования"),
+            @ApiResponse(responseCode = "204", description = "Бронирования не найдены")
+    })
     @GetMapping("/all")
     public ResponseEntity<List<BookingWithUserDTO>> getAll(@RequestHeader("Authorization") String authHeader) {
         UserDTO user = userServerProxy.get(authHeader).getBody();
@@ -32,10 +46,18 @@ public class BookingController {
                 .body(bookings);
     }
 
+    @Operation(
+            summary = "Создание бронирования",
+            description = "Создает бронирование для пользователя"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Бронирование успешно создано"),
+            @ApiResponse(responseCode = "400", description = "Время бронирования уже занято")
+    })
     @PostMapping("/create")
     public ResponseEntity<BookingDTO> createBooking(
             @RequestHeader("Authorization") String authHeader,
-            @RequestBody BookingDTO bookingDTO) {
+            @RequestBody @Valid BookingDTO bookingDTO) {
         UserDTO user = userServerProxy.get(authHeader).getBody();
         BookingDTO bookingDTO1 = new BookingDTO(user.id(), bookingDTO.roomId(), bookingDTO.start(), bookingDTO.end());
         bookingService.addBooking(bookingDTO1);
@@ -44,10 +66,18 @@ public class BookingController {
                 .body(bookingDTO1);
     }
 
+    @Operation(
+            summary = "Отмена бронирования",
+            description = "Отменяет активное бронирование пользователя"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Бронирование успешно отменено"),
+            @ApiResponse(responseCode = "404", description = "Активное бронирование не найдено")
+    })
     @PatchMapping("/cancelled")
     public ResponseEntity<BookingDTO> cancelledBooking(
             @RequestHeader("Authorization") String authHeader,
-            @RequestBody CancelRequestDTO cancelRequestDTO
+            @RequestBody @Valid CancelRequestDTO cancelRequestDTO
             ) {
         UserDTO user = userServerProxy.get(authHeader).getBody();
         BookingDTO bookingDTO = bookingService.cancelledBooking(cancelRequestDTO.bookingId(), user.id());
