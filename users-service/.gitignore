@@ -9,6 +9,7 @@ backup/
 !**/src/test/**/target/
 test-service/
 tests-service/
+JswAuthenticationFilter.md
 
 
 ### STS ###

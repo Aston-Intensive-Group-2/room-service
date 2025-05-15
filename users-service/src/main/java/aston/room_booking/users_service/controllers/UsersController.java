@@ -1,21 +1,11 @@
 package aston.room_booking.users_service.controllers;
 
 import aston.room_booking.users_service.controllers.interfaces.UserController;
-import aston.room_booking.users_service.models.dtos.ErrorDto;
 import aston.room_booking.users_service.models.dtos.MessageDto;
-import aston.room_booking.users_service.models.dtos.UserDto;
 import aston.room_booking.users_service.models.entities.User;
 import aston.room_booking.users_service.services.interfaces.UserService;
-import aston.room_booking.users_service.utils.ErrorDroConstants;
 import aston.room_booking.users_service.utils.StaticConstants;
 import aston.room_booking.users_service.utils.exceptions.*;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -111,5 +101,24 @@ private final UserService userService;
                         new MessageDto(
                                 new Date().toString(),
                                 "Метод ещё не реализован"));
+    }
+
+    @GetMapping("/api/v1/users/health")
+    public ResponseEntity<?> health ()
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException {
+
+        var userDto = userService.get();
+        if(userDto != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(userDto);
+        }
+        else {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(
+                            new MessageDto(
+                                    new Date().toString(),
+                                    StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE));
+        }
     }
 }

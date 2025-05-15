@@ -1,0 +1,52 @@
+services:
+  users-service:
+    build: .
+    image: users-service:latest
+    container_name: users-service
+    ports:
+      - "8091:8091"
+    depends_on:
+      users-service-db:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://users-service-db:5432/users_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_HOST=users-service-db
+      - SPRING_DATASOURCE_PORT=5432
+      - SPRING_DISCOVERY_SERVER_HOST=discovery-server
+      - ROOMS_SERVICE_HOST=room-service
+      - ROOMS_SERVICE_PORT=8093
+      - USERS_SERVICE_HOST=users-service
+      - USERS_SERVICE_PORT=8091
+    networks:
+      - room-booking
+
+  users-service-db:
+    image: postgres:16.1
+    container_name: users-service-db
+    ports:
+      - "5441:5432"
+    environment:
+      - POSTGRES_DB=users_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      start_period: 10s
+      timeout: 5s
+      interval: 10s
+      retries: 5
+    volumes:
+      - users-service-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+    networks:
+      - room-booking
+
+volumes:
+  users-service-db-data:
+
+networks:
+  room-booking:
+    driver: bridge

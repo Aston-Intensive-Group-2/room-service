@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -65,50 +66,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException, TokenValidationException {
-
-        String requestURI = request.getRequestURI();
-
-        // КОСТЫЛЬ !
-        // пришлось вводить дополнительную логику
-        // после внедрения Swagger перестал работать SecurityFilterChain
-
-        // Не проходили запросы к эндпойнтам:
-        // -> документации OpenApi
-        // -> Swagger
-        // -> /api/v1/users POST-запрос на создание пользователя
-        // не смотря на разрешение в списке SecurityFilterChain
-        if (shouldSkip(requestURI, request)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if (request.getHeader("Authorization") == null || request.getHeader("Authorization").isEmpty()) {
-            throw new AuthorizationException(StaticConstants.BASIC_AUTHORIZATION_HEADER_IS_MISSING_EXCEPTION_MESSAGE);
-        }
-
-        try {
-            String token = jwtTokenProvider.resolveToken(request);
+            throws IOException, ServletException {
+        String token = jwtTokenProvider.resolveToken(request);
+        if (token != null) {
             Authentication authentication = authenticationManager.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (Exception e) {
-            if(e.getMessage().equals(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE)) {
-                logger.error("%s; %s".formatted(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE, e.getMessage()));
-                throw new UserNotFoundException(StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE);
-            }
-            else {
-                logger.error("%s; %s".formatted(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE, e.getMessage()));
-                throw new TokenValidationException(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE);
-            }
         }
-
         filterChain.doFilter(request, response);
     }
 
-    private boolean shouldSkip(String requestURI, HttpServletRequest request) {
-        return requestURI.contains("/swagger-ui") ||
-                requestURI.contains("/v3/api-docs") ||
-                (requestURI.contains("/api/v1/users") &&
-                        request.getMethod().equals(HttpMethod.POST.toString()));
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getRequestURI().contains("/swagger-ui") || request.getRequestURI().contains("/v3/api-docs") ||
+                (request.getRequestURI().contains("/api/v1/users") && "POST".equals(request.getMethod()));
     }
 }

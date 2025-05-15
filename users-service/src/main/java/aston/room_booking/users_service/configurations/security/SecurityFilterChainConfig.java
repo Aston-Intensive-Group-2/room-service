@@ -38,7 +38,7 @@ public class SecurityFilterChainConfig implements WebMvcConfigurer {
      * <br/>
      * Удалось избавиться от явного введения конструктора в фильтре
      * <br/>
-     * Однако конструктор в любом случае пришлось явно объявлять конструктор если не в классе,
+     * Однако в любом случае пришлось явно объявлять конструктор если не в классе,
      * то здесь - в ручном конфигурировании бина
      *
      * @param userRepository Реозиторий пользователей
@@ -81,15 +81,14 @@ public class SecurityFilterChainConfig implements WebMvcConfigurer {
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/account/login").permitAll()
-                        .requestMatchers("/api/v1/users/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/users/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
+                .addFilterBefore(jwtFilter, BasicAuthenticationFilter.class)
                 .addFilterBefore(exceptionFilter, LoginAuthenticationFilter.class)
                 .addFilter(loginFilter)
-                .addFilterAt(jwtFilter, BasicAuthenticationFilter.class)
+
                 .httpBasic(withDefaults())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
