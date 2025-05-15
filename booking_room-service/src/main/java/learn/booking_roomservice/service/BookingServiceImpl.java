@@ -21,12 +21,13 @@ public class BookingServiceImpl implements BookingService {
     private final BookingMapper bookingMapper;
 
     @Override
-    public void addBooking(BookingDTO bookingDTO) {
+    public BookingDTO addBooking(BookingDTO bookingDTO) {
         if (isValidRegistration(bookingDTO)) {
             bookingRepository.save(bookingMapper.toBooking(bookingDTO));
         } else {
             throw new TimeBookingRegistrationException();
         }
+        return bookingDTO;
     }
 
     @Override

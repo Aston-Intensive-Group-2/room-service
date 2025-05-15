@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface BookingService {
-    void addBooking(BookingDTO bookingDTO);
+    BookingDTO addBooking(BookingDTO bookingDTO);
 
     BookingDTO cancelledBooking(UUID bookingId, Long userId);
 
