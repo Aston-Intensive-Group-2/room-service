@@ -1,0 +1,1128 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API для управления пользователями сервиса",
+    "description": "API предоставляет эндпоинты для управления пользователями сервиса.",
+    "contact": {
+      "name": "Andr33w McFly",
+      "email": "my.email@example.com"
+    },
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8091",
+      "description": "Users API Server",
+      "x-link": {
+        "roomsApi": {
+          "operationId": "getRooms",
+          "server": {
+            "url": "http://localhost:8093"
+          }
+        }
+      }
+    },
+    {
+      "url": "http://localhost:8093",
+      "description": "Rooms API Server",
+      "x-link": {
+        "userApi": {
+          "operationId": "getUser",
+          "server": {
+            "url": "http://localhost:8091"
+          }
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Контроллер пользователей",
+      "description": "REST API контроллер регистрации и авторизации пользователей"
+    },
+    {
+      "name": "Контроллер администрирования пользователей",
+      "description": "REST API контроллер администрирования пользовательских данных"
+    }
+  ],
+  "paths": {
+    "/api/v1/users": {
+      "get": {
+        "tags": [
+          "Контроллер пользователей"
+        ],
+        "summary": "Получить данные текущего авторизованного пользователя",
+        "description": "возвращает данные текущего пользователя",
+        "operationId": "get",
+        "responses": {
+          "200": {
+            "description": "Пользователь найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Токен не прошел валидацию",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 400,
+                  "message": "Token is invalid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не авторизован",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 401,
+                  "message": "Access Denied!"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пользователь не найден",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 404,
+                  "message": "User not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка при работе сервиса",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 500,
+                  "message": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Контроллер пользователей"
+        ],
+        "summary": "Обновить профиль текущего авторизованного пользователя",
+        "description": "Обновляет данные текущего пользователя",
+        "operationId": "update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Профиль пользователя обновлён",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректный id или отсутствует тело запроса; либо userName или email уже заняты",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                },
+                "examples": {
+                  "Отсутствует тело запроса": {
+                    "description": "Отсутствует тело запроса",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Response body is required"
+                    }
+                  },
+                  "Токен не прошел валидацию": {
+                    "description": "Токен не прошел валидацию",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Token is invalid"
+                    }
+                  },
+                  "userName уже занят": {
+                    "description": "userName уже занят",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "UserName is already in use"
+                    }
+                  },
+                  "email уже занят": {
+                    "description": "email уже занят",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "email is already in use"
+                    }
+                  },
+                  "поле password - пустое": {
+                    "description": "поле password - пустое",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Поле 'password' - пустое или имеет некорректное наименование"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не авторизован",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 401,
+                  "message": "Access Denied!"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пользователь не найден",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 404,
+                  "message": "User not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка при работе сервиса",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 500,
+                  "message": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Контроллер пользователей"
+        ],
+        "summary": "Создать нового пользователя",
+        "description": "Создаёт нового пользователя",
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Пользователь создан",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "отсутствует тело запроса, либо userName или email уже заняты",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                },
+                "examples": {
+                  "Отсутствует тело запроса": {
+                    "description": "Отсутствует тело запроса",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Response body is required"
+                    }
+                  },
+                  "userName уже занят": {
+                    "description": "userName уже занят",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "UserName is already in use"
+                    }
+                  },
+                  "email уже занят": {
+                    "description": "email уже занят",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "email is already in use"
+                    }
+                  },
+                  "поле password - пустое": {
+                    "description": "поле password - пустое",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Поле 'password' - пустое или имеет некорректное наименование"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка при работе сервиса",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 500,
+                  "message": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Контроллер пользователей"
+        ],
+        "summary": "Удалить профиль текущего авторизованного пользователя",
+        "description": "Удаляет данные текущего пользователя",
+        "operationId": "delete",
+        "responses": {
+          "200": {
+            "description": "Пользователь удалён",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "message": "User is delete successful"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Токен не прошел валидацию",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 400,
+                  "message": "Token is invalid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не авторизован",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 401,
+                  "message": "Access Denied!"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пользователь не найден",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 404,
+                  "message": "User not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка при работе сервиса",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 500,
+                  "message": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/{id}": {
+      "get": {
+        "tags": [
+          "Контроллер администрирования пользователей"
+        ],
+        "summary": "Получить пользователя по id",
+        "description": "возвращает пользователя по id",
+        "operationId": "getById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректный id",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 400,
+                  "message": "Некорректный id"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не авторизован",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 401,
+                  "message": "Access Denied!"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "У пользователя нет прав доступа",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 403,
+                  "message": "Access Denied!"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пользователь не найден",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 404,
+                  "message": "User not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка при работе сервиса",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 500,
+                  "message": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Контроллер администрирования пользователей"
+        ],
+        "summary": "Обновить данные пользователя по id",
+        "description": "Обновляет данные пользователя по id",
+        "operationId": "updateById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Профиль пользователя обновлён",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректный id или отсутствует тело запроса; либо userName или email уже заняты",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                },
+                "examples": {
+                  "Некорректный id": {
+                    "description": "Некорректный id",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Некорректный id"
+                    }
+                  },
+                  "Отсутствует тело запроса": {
+                    "description": "Отсутствует тело запроса",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Response body is required"
+                    }
+                  },
+                  "Токен не прошел валидацию": {
+                    "description": "Токен не прошел валидацию",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Token is invalid"
+                    }
+                  },
+                  "userName уже занят": {
+                    "description": "userName уже занят",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "UserName is already in use"
+                    }
+                  },
+                  "email уже занят": {
+                    "description": "email уже занят",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "email is already in use"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не авторизован",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 401,
+                  "message": "Access Denied!"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "У пользователя нет прав доступа",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 403,
+                  "message": "Access Denied!"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пользователь не найден",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 404,
+                  "message": "User not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка при работе сервиса",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 500,
+                  "message": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Контроллер администрирования пользователей"
+        ],
+        "summary": "Удалить пользователя по id",
+        "description": "Удаляет пользователя по id",
+        "operationId": "deletById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь удалён",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "message": "User is delete successful"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректный id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                },
+                "examples": {
+                  "Некорректный id": {
+                    "description": "Некорректный id",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Некорректный id"
+                    }
+                  },
+                  "Токен не прошел валидацию": {
+                    "description": "Токен не прошел валидацию",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Token is invalid"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не авторизован",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 401,
+                  "message": "Access Denied!"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "У пользователя нет прав доступа",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 403,
+                  "message": "Access Denied!"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пользователь не найден",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 404,
+                  "message": "User not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка при работе сервиса",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 500,
+                  "message": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin": {
+      "get": {
+        "tags": [
+          "Контроллер администрирования пользователей"
+        ],
+        "summary": "Получить список всех пользователей",
+        "description": "возвращает список всех пользователей",
+        "operationId": "getAll",
+        "responses": {
+          "200": {
+            "description": "Список пользователей получен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Список пользователей пуст",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 204,
+                  "message": "No users found"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Токен не прошел валидацию",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 400,
+                  "message": "Token is invalid"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не авторизован",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 401,
+                  "message": "Access Denied!"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "У пользователя нет прав доступа",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 403,
+                  "message": "Access Denied!"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка при работе сервиса",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 500,
+                  "message": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Контроллер администрирования пользователей"
+        ],
+        "summary": "Создать нового пользователя",
+        "description": "Создаёт нового пользователя",
+        "operationId": "create_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Пользователь создан",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "отсутствует тело запроса, либо userName или email уже заняты",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                },
+                "examples": {
+                  "Отсутствует тело запроса": {
+                    "description": "Отсутствует тело запроса",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Response body is required"
+                    }
+                  },
+                  "Токен не прошел валидацию": {
+                    "description": "Токен не прошел валидацию",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Token is invalid"
+                    }
+                  },
+                  "userName уже занят": {
+                    "description": "userName уже занят",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "UserName is already in use"
+                    }
+                  },
+                  "email уже занят": {
+                    "description": "email уже занят",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "email is already in use"
+                    }
+                  },
+                  "поле password - пустое": {
+                    "description": "поле password - пустое",
+                    "value": {
+                      "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                      "statusCode": 400,
+                      "message": "Поле 'password' - пустое или имеет некорректное наименование"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не авторизован",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 403,
+                  "message": "Access Denied!"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "У пользователя нет прав доступа",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 404,
+                  "message": "User not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка при работе сервиса",
+            "content": {
+              "application/json": {
+                "example": {
+                  "dateTime": "Fri May 09 00:07:16 GMT+05:00 2025",
+                  "statusCode": 500,
+                  "message": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GrantedAuthority": {
+        "type": "object",
+        "properties": {
+          "authority": {
+            "type": "string"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Id пользователя",
+            "example": 1
+          },
+          "userName": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "email": {
+            "type": "string",
+            "description": "Email пользователя",
+            "example": "Andr33w@example.com"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "FirstName пользователя",
+            "example": "Andrew"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "LastName пользователя",
+            "example": "McFlyev"
+          },
+          "password": {
+            "type": "string",
+            "description": "пароль пользователя",
+            "example": "qwerty",
+            "maxLength": 2147483647,
+            "minLength": 3
+          },
+          "phone": {
+            "type": "string"
+          },
+          "userRole": {
+            "type": "string",
+            "description": "Роль пользователя",
+            "enum": [
+              "USER",
+              "ADMIN"
+            ],
+            "example": "USER"
+          },
+          "image": {
+            "type": "string",
+            "format": "byte",
+            "description": "изображение пользователя",
+            "example": null
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastLoginDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "authorities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GrantedAuthority"
+            }
+          },
+          "username": {
+            "type": "string"
+          },
+          "accountNonExpired": {
+            "type": "boolean"
+          },
+          "credentialsNonExpired": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "accountNonLocked": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Id пользователя",
+            "example": 1
+          },
+          "userName": {
+            "type": "string",
+            "description": "UserName пользователя",
+            "example": "Andr33w"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email пользователя",
+            "example": "Andr33w@example.com"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "FirstName пользователя",
+            "example": "Andrew"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "LastName пользователя",
+            "example": "McFlyev"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Phone number пользователя",
+            "example": "+1234567890"
+          },
+          "userRole": {
+            "type": "string",
+            "description": "Роль пользователя",
+            "enum": [
+              "USER",
+              "ADMIN"
+            ],
+            "example": "USER"
+          },
+          "image": {
+            "type": "string",
+            "format": "byte",
+            "description": "изображение пользователя",
+            "example": null
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastLoginDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ErrorDto": {
+        "type": "object",
+        "properties": {
+          "dateTime": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "Bearer Token",
+        "name": "Authorization",
+        "in": "header",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

@@ -25,7 +25,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://${SPRING_DISCOVERY_SERVER_HOST:discovery-server}:8761/eureka/
+      defaultZone: http://${SPRING_DISCOVERY_SERVER_HOST:localhost}:8761/eureka/
   instance:
     preferIpAddress: true
 
@@ -34,6 +34,28 @@ logging:
     org.springframework.orm.jpa: INFO
     org.springframework.transaction: INFO
     org.springframework.web: INFO
+
+springdoc:
+  swagger-ui:
+    url: /api/v1/users/v3/api-docs
+    path: /api/v1/users/swagger-ui/index.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    #config-url: /v3/api-docs/swagger-config
+    layout: StandaloneLayout
+    custom-js: /swagger-ui-init.js
+  api-docs:
+    path: /api/v1/users/v3/api-docs
+
+rooms:
+  server:
+    url: http://${ROOMS_SERVICE_HOST:localhost}:${ROOMS_SERVICE_PORT:8093}
+    path: /api/v1/rooms
+
+users:
+  server:
+    url: http://localhost:${USERS_SERVICE_PORT:8091}
+    path: /api/v1/users
 
 #environment:
   #- SPRING_LIQUIBASE_CHANGELOG=classpath:/db/changelog/db.changelog-master.yaml

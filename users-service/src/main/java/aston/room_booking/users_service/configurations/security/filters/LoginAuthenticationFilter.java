@@ -10,12 +10,12 @@ import aston.room_booking.users_service.utils.StaticConstants;
 import aston.room_booking.users_service.utils.exceptions.AuthorizationException;
 
 import aston.room_booking.users_service.utils.exceptions.InvalidUsernameOrPasswordException;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
@@ -38,7 +38,7 @@ import java.util.Date;
  * @author 4ndr33w
  */
 @Slf4j
-@Configuration
+@AllArgsConstructor
 public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final UserRepository userRepository;
@@ -46,28 +46,7 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * Конструктор фильтра аутенфикации.
-     * Пришлось его внедрить, ибо не мог избавиться от ошибки инициализации бина
-     *
-     * @param userRepository
-     * @param jwtTokenProvider
-     * @param authenticationManager
-     */
-    public LoginAuthenticationFilter(
-            JwtTokenProvider jwtTokenProvider,
-            CustomAuthenticationManager authenticationManager,
-            UserRepository userRepository
-    ) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-
-        setAuthenticationManager(authenticationManager);
-        setFilterProcessesUrl("/account/login");
-    }
-
-    /**
-     * Метод вызывается из {@link SecurityFilterChainConfig#filterChain(HttpSecurity)}
+     * Метод вызывается из {@link SecurityFilterChainConfig#filterChain(HttpSecurity, LoginAuthenticationFilter, JwtAuthenticationFilter, ExceptionHndlerFilter)}
      * <br/>
      * как фильтр для перехвата {@code email} и {@code password};
      * <p>
@@ -79,12 +58,12 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
      *   <li>Создаёт объект-контейнер {@code UsernamePasswordAuthenticationToken}, содержащий {@code password} и {@code user};</li>
      * </ul>
      * </p>
-     * @param request
-     * @param response
+     * @param request HttpRequest
+     * @param response HttpResponse
      *
      * @return {@code Authentication} - объект-контейнер, содержащий логин и пароль
      *
-     * @throws AuthenticationException
+     * @throws AuthenticationException Ошибка при аутенфикации
      */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -148,12 +127,12 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
      * <br/>
      * Так же токен добавляется в заголовок авторизации
      *
-     * @param request
-     * @param response
-     * @param chain
-     * @param authResult
+     * @param request HttpRequest
+     * @param response HttpResponse
+     * @param chain цепочка фильтров
+     * @param authResult объект аутенфикации, содержащий пользователя и список ролей
      *
-     * @throws IOException
+     * @throws IOException ошибка ввода/вывода
      */
     @Override
     public void successfulAuthentication(HttpServletRequest request,
@@ -178,15 +157,14 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
      * <br/>
      * в случае выброса исключения в процессе аутенфикации
      *
-     * @param request
-     * @param response
-     * @param failed
-     * @throws IOException
+     * @param request HttpRequest
+     * @param response HttpResponse
+     * @param failed возникшая при аутенфикации ошибка
      */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request,
                                               HttpServletResponse response,
-                                              AuthenticationException failed) throws IOException {
+                                              AuthenticationException failed) {
 
         throw failed;
     }

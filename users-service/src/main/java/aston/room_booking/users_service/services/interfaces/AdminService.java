@@ -61,14 +61,12 @@ public interface AdminService<D, E> {
      *
      * @return {@code D} - DTO
      *
-     * @throws EmailAlreadyUseException ошибка уникальности email
      * @throws DatabaseOperationException ошибка выполнения операции с базой данных
      * @throws ArgumentIsNullException переданный на вход параметр {@code null}
      * @throws ErrorFetchingUserDataException ошибка парсинга в Dto
      */
     D create(E entity)
-            throws EmailAlreadyUseException,
-            DatabaseOperationException,
+            throws DatabaseOperationException,
             ArgumentIsNullException,
             ErrorFetchingUserDataException;
 
@@ -87,8 +85,7 @@ public interface AdminService<D, E> {
      */
     Collection<D> getAll()
             throws NoUsersFoundException,
-            ErrorFetchingUserDataException,
-            DatabaseOperationException;
+            ErrorFetchingUserDataException;
 
     /**
      * Метод возвращает {@code D} DTO пользователя
@@ -105,8 +102,7 @@ public interface AdminService<D, E> {
     D getByEmail(String email)
             throws UserNotFoundException,
             ErrorFetchingUserDataException,
-            ArgumentIsNullException,
-            DatabaseOperationException;
+            ArgumentIsNullException;
 
     /**
      * Метод возвращает {@code D} DTO пользователя
@@ -118,11 +114,12 @@ public interface AdminService<D, E> {
      *
      * @throws UserNotFoundException Пользователь с указанным {@code id} не найден
      * @throws ErrorFetchingUserDataException ошибка парсинга в DTO
+     * @throws InvalidArgumentException Переданный на вход {@code id} - отрицательный
      */
     D getById( long id)
             throws UserNotFoundException,
-            ErrorFetchingUserDataException,
-            DatabaseOperationException;
+            InvalidArgumentException,
+            ErrorFetchingUserDataException;
 
     /**
      * Метод удаляет пользователя
@@ -133,10 +130,12 @@ public interface AdminService<D, E> {
      * @return {@code boolean}
      *
      * @throws UserNotFoundException Пользователь с указанным {@code id} не найден
+     * @throws DatabaseOperationException Ошибка при удалении пользователя
+     * @throws InvalidArgumentException Переданный на вход {@code id} - отрицательный
      */
     MessageDto deleteById(long id)
             throws UserNotFoundException,
-            ErrorFetchingUserDataException,
+            InvalidArgumentException,
             DatabaseOperationException;
 
     /**
@@ -168,13 +167,15 @@ public interface AdminService<D, E> {
      * @return {@code D} - DTO
      *
      * @throws UserNotFoundException Пользователь не найден
-     * @throws ArgumentIsNullException переданный на вход параметр {@code null}
+     * @throws InvalidArgumentException Переданный на вход {@code id} - отрицательный
      * @throws ErrorFetchingUserDataException ошибка парсинга в DTO
      * @throws DatabaseOperationException ошибка при обращении к БД
+     * @throws ArgumentIsNullException Переданный {@code entity} равен {@code null}
      */
-    D update(long id, E entity)
+    D updateById(long id, E entity)
             throws UserNotFoundException,
             ErrorFetchingUserDataException,
+            InvalidArgumentException,
             ArgumentIsNullException,
             DatabaseOperationException;
 }

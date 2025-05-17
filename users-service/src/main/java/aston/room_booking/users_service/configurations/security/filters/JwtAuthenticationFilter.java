@@ -3,14 +3,21 @@ package aston.room_booking.users_service.configurations.security.filters;
 import aston.room_booking.users_service.configurations.security.components.JwtTokenProvider;
 
 import aston.room_booking.users_service.configurations.security.CustomAuthenticationManager;
+import aston.room_booking.users_service.utils.StaticConstants;
+import aston.room_booking.users_service.utils.exceptions.AuthorizationException;
+import aston.room_booking.users_service.utils.exceptions.TokenValidationException;
+import aston.room_booking.users_service.utils.exceptions.UserNotFoundException;
+import io.swagger.v3.oas.models.PathItem;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -27,7 +34,7 @@ import java.io.IOException;
  * @version 1.0
  * @author 4ndr33w
  */
-@Configuration
+@Component
 @AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -49,29 +56,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * </ul>
      * <hr/>
      * </p>
-     * @param request
-     * @param response
-     * @param filterChain
+     * @param request HttpRequest
+     * @param response HttpResponse
+     * @param filterChain цепочка фильтров
      *
      * @throws ServletException ошибка при обработке сервлета
      * @throws IOException ошибка входных данных
+     * @throws TokenValidationException ошибка валидации токена
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws IOException, ServletException {
         String token = jwtTokenProvider.resolveToken(request);
-        Authentication authentication = authenticationManager.getAuthentication(token);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-      /*  try {
-            String token = jwtTokenProvider.resolveToken(request);
+        if (token != null) {
             Authentication authentication = authenticationManager.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        catch (Exception e) {
-            logger.error("%s; %s".formatted(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE, e.getMessage()));
-            throw new TokenValidationException(StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE);
-        }*/
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getRequestURI().contains("/swagger-ui") || request.getRequestURI().contains("/v3/api-docs") ||
+                (request.getRequestURI().contains("/api/v1/users") && "POST".equals(request.getMethod()));
     }
 }

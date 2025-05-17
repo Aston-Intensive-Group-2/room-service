@@ -8,6 +8,9 @@ backup/
 !**/src/main/**/target/
 !**/src/test/**/target/
 test-service/
+tests-service/
+JswAuthenticationFilter.md
+
 
 ### STS ###
 .apt_generated

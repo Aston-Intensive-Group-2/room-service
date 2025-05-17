@@ -80,12 +80,14 @@ public interface UserService<D, E> {
      *
      * @return {@code D} - DTO
      *
-     * @throws EmailAlreadyUseException ошибка уникальности email
      * @throws DatabaseOperationException ошибка выполнения операции с базой данных
      * @throws ArgumentIsNullException переданный на вход параметр {@code null}
      * @throws ErrorFetchingUserDataException ошибка парсинга в Dto
      */
-    D create(E entity) throws EmailAlreadyUseException, DatabaseOperationException, ArgumentIsNullException, ErrorFetchingUserDataException;
+    D create(E entity)
+            throws DatabaseOperationException,
+            ArgumentIsNullException,
+            ErrorFetchingUserDataException;
 
     /**
      * Метод возвращает {@code D} DTO пользователя
@@ -97,7 +99,9 @@ public interface UserService<D, E> {
      * @throws ErrorFetchingUserDataException ошибка парсинга в DTO
      * @throws DatabaseOperationException ошибка при выполнение запроса на получение данных объекта
      */
-    D get() throws UserNotFoundException, ErrorFetchingUserDataException, TokenValidationException, DatabaseOperationException;
+    D get()
+            throws UserNotFoundException,
+            ErrorFetchingUserDataException;
 
     /**
      * Метод удаляет пользователя
@@ -107,9 +111,9 @@ public interface UserService<D, E> {
      * @return {@code MessageDto} true в случае успешного удаления
      *
      * @throws UserNotFoundException Пользователь с указанным {@code id} не найден
-     * @throws DatabaseOperationException ошибка при выполнение запроса удаления объекта
      */
-    MessageDto delete() throws UserNotFoundException, DatabaseOperationException;
+    MessageDto delete()
+            throws UserNotFoundException;
 
     /**
      * Метод обновления данных профиля пользователя
@@ -137,10 +141,11 @@ public interface UserService<D, E> {
      *
      * @return {@code D} - DTO с обновлёнными полями
      *
-     * @throws UserNotFoundException Пользователь не найден
      * @throws ArgumentIsNullException переданный на вход параметр {@code null}
      * @throws ErrorFetchingUserDataException ошибка парсинга в DTO
      * @throws DatabaseOperationException ошибка при выполнение запроса обновления объекта
      */
-    D update(E entity) throws UserNotFoundException, ArgumentIsNullException, ErrorFetchingUserDataException, DatabaseOperationException;
+    D update(E entity)
+            throws ArgumentIsNullException,
+            ErrorFetchingUserDataException;
 }

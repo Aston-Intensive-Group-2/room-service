@@ -42,13 +42,16 @@ public class ExceptionResolver {
      * <br/>
      * содержит код ошибки, дату, сообщение
      *
-     * @param exception
+     * @param exception возникцее исключение
+     *
      * @return {@code ErrorDto} - ответ
      */
     public ErrorDto handleException(Exception exception) {
 
-        var cause = exception.getCause();//getRootCause(exception);
-        String message = exception.getMessage();
+        var cause = exception.getCause();
+
+        //var cause = getRootCause(exception);
+        String message = cause == null? exception.getMessage() : cause.getMessage();//exception.getMessage();
 
         int statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
@@ -63,32 +66,43 @@ public class ExceptionResolver {
             message = StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE;
             statusCode = HttpServletResponse.SC_BAD_REQUEST;
         }
-        if(exception instanceof MethodArgumentNotValidException) {
-            message = ((MethodArgumentNotValidException) exception)
-                    .getBindingResult()
-                    .getAllErrors().stream()
-                    .findFirst()
-                    .map(this::resolveErrorMessage)
-                    .orElse("Validation failed");
+        if (exception instanceof AuthenticationException) {
             statusCode = HttpServletResponse.SC_BAD_REQUEST;
+            message = StaticConstants.INVALID_USERNAME_OR_PASSWORD_EXCEPTION_MESSAGE;
+        }
+        if (exception instanceof AuthorizationDeniedException) {
+            statusCode = HttpServletResponse.SC_FORBIDDEN;
+            if(exception.getMessage().contains(StaticConstants.FORBIDDEN_OPERATION_EXCEPTION_MESSAGE)) {
+                message = "Access Denied";
+            }
+            else {
+                message = exception.getMessage();
+            }
         }
         if (exception instanceof AuthorizationException) {
 
             statusCode = HttpServletResponse.SC_BAD_REQUEST;
+
+            if(exception.getMessage().contains(StaticConstants.BASIC_AUTHORIZATION_HEADER_IS_MISSING_EXCEPTION_MESSAGE)) {
+                message = "Access Denied!";
+                statusCode = HttpServletResponse.SC_UNAUTHORIZED;
+            }
         }
         if (exception instanceof CustomAuthenticationException) {
 
             statusCode = HttpServletResponse.SC_BAD_REQUEST;
         }
-        if (exception instanceof AuthorizationException) {
-
-            statusCode = HttpServletResponse.SC_BAD_REQUEST;
-        }
         if (exception instanceof DatabaseOperationException) {
 
-            if (message.contains("duplicate key")) {
-                message = StaticConstants.USER_ALREADY_EXISTS_EXCEPTION_MESSAGE;
-                statusCode = HttpServletResponse.SC_BAD_REQUEST;
+            if (message.contains("duplicate key") || cause.getMessage().contains("duplicate key")) {
+                if (message.contains("Key (user_name)") || cause.getMessage().contains("Key (user_name)")) {
+                    message = StaticConstants.USERNAME_IS_ALREADY_IN_USE_EXCEPTION_MESSAGE;
+                    statusCode = HttpServletResponse.SC_BAD_REQUEST;
+                }
+                else {
+                    message = StaticConstants.EMAIL_IS_ALREADY_IN_USE_EXCEPTION_MESSAGE;
+                    statusCode = HttpServletResponse.SC_BAD_REQUEST;
+                }
             } else {
                 statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
             }
@@ -105,29 +119,14 @@ public class ExceptionResolver {
             statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
             message = StaticConstants.UNABLE_TO_FETCH_USER_EXCEPTION_MESSAGE;
         }
-        if (exception instanceof JwtException) {
-            statusCode = HttpServletResponse.SC_EXPECTATION_FAILED;
-            message = StaticConstants.JWT_VERIFICATION_EXCEPTION;
-        }
-        if (exception instanceof NoUsersFoundException) {
-            statusCode = HttpServletResponse.SC_NOT_FOUND;
-            message = StaticConstants.NO_USERS_FOUND_EXCEPTION_MESSAGE;
-        }
-        if (exception instanceof TokenValidationException) {
-            statusCode = HttpServletResponse.SC_BAD_REQUEST;
-            message = StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE;
-        }
-        if (exception instanceof UserNotFoundException) {
-            statusCode = HttpServletResponse.SC_NOT_FOUND;
-            message = StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE;
-        }
-        if (exception instanceof InvalidUsernameOrPasswordException) {
-            statusCode = HttpServletResponse.SC_BAD_REQUEST;
-            message = StaticConstants.INVALID_USERNAME_OR_PASSWORD_EXCEPTION_MESSAGE;
-        }
-        if (exception instanceof AuthenticationException) {
-            statusCode = HttpServletResponse.SC_BAD_REQUEST;
-            message = StaticConstants.INVALID_USERNAME_OR_PASSWORD_EXCEPTION_MESSAGE;
+        if (exception instanceof ForbiddenOperationException) {
+            statusCode = HttpServletResponse.SC_FORBIDDEN;
+            if(exception.getMessage().contains(StaticConstants.FORBIDDEN_OPERATION_EXCEPTION_MESSAGE)) {
+                message = StaticConstants.FORBIDDEN_OPERATION_EXCEPTION_MESSAGE;
+            }
+            else {
+                message = exception.getMessage();
+            }
         }
         if (exception instanceof HttpMessageNotReadableException) {
             statusCode = HttpServletResponse.SC_BAD_REQUEST;
@@ -138,6 +137,36 @@ public class ExceptionResolver {
                 message = exception.getMessage();
             }
         }
+        if (exception instanceof InvalidArgumentException) {
+            message = "Некорректный id";
+            statusCode = HttpServletResponse.SC_BAD_REQUEST;
+        }
+        if (exception instanceof InvalidUsernameOrPasswordException) {
+            statusCode = HttpServletResponse.SC_BAD_REQUEST;
+            message = StaticConstants.INVALID_USERNAME_OR_PASSWORD_EXCEPTION_MESSAGE;
+        }
+        if (exception instanceof IOException) {
+            statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+            message = StaticConstants.UNEXPECTED_ERROR_MESSAGE;
+        }
+        if (exception instanceof JwtException) {
+            statusCode = HttpServletResponse.SC_EXPECTATION_FAILED;
+            message = StaticConstants.JWT_VERIFICATION_EXCEPTION;
+        }
+        if (exception instanceof MethodArgumentNotValidException) {
+            message = ((MethodArgumentNotValidException) exception)
+                    .getBindingResult()
+                    .getAllErrors().stream()
+                    .findFirst()
+                    .map(this::resolveErrorMessage)
+                    .orElse("Validation failed");
+
+            statusCode = HttpServletResponse.SC_BAD_REQUEST;
+        }
+        if (exception instanceof NoUsersFoundException) {
+            statusCode = HttpServletResponse.SC_NOT_FOUND;
+            message = StaticConstants.NO_USERS_FOUND_EXCEPTION_MESSAGE;
+        }
         if (exception instanceof NullPointerException) {
             statusCode = HttpServletResponse.SC_BAD_REQUEST;
             if(exception.getMessage().contains(StaticConstants.ARGUMENT_IS_NULL_EXCEPTION_MESSAGE)) {
@@ -147,31 +176,17 @@ public class ExceptionResolver {
                 message = exception.getMessage();
             }
         }
-        if (exception instanceof ForbiddenOperationException) {
-            statusCode = HttpServletResponse.SC_FORBIDDEN;
-            if(exception.getMessage().contains(StaticConstants.FORBIDDEN_OPERATION_EXCEPTION_MESSAGE)) {
-                message = StaticConstants.FORBIDDEN_OPERATION_EXCEPTION_MESSAGE;
-            }
-            else {
-                message = exception.getMessage();
-            }
-        }
-        if (exception instanceof AuthorizationDeniedException) {
-            statusCode = HttpServletResponse.SC_FORBIDDEN;
-            if(exception.getMessage().contains(StaticConstants.FORBIDDEN_OPERATION_EXCEPTION_MESSAGE)) {
-                message = "Access Denied";
-            }
-            else {
-                message = exception.getMessage();
-            }
-        }
-        if (exception instanceof IOException) {
-            statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-            message = StaticConstants.UNEXPECTED_ERROR_MESSAGE;
-        }
         if (exception instanceof SQLException) {
             statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
             message = StaticConstants.UNEXPECTED_ERROR_MESSAGE;
+        }
+        if (exception instanceof TokenValidationException) {
+            statusCode = HttpServletResponse.SC_BAD_REQUEST;
+            message = StaticConstants.TOKEN_VALIDATION_EXCEPTION_MESSAGE;
+        }
+        if (exception instanceof UserNotFoundException) {
+            statusCode = HttpServletResponse.SC_NOT_FOUND;
+            message = StaticConstants.USER_NOT_FOUND_EXCEPTION_MESSAGE;
         }
 
         log.error(message);
@@ -181,6 +196,7 @@ public class ExceptionResolver {
                 statusCode,
                 message );
     }
+
 /*
     private Throwable getRootCause(Throwable ex) {
         Throwable cause = ex;
@@ -189,6 +205,7 @@ public class ExceptionResolver {
         }
         return cause;
     }*/
+
     private String resolveErrorMessage(ObjectError error) {
         if (error instanceof FieldError fieldError) {
             return fieldError.getDefaultMessage();

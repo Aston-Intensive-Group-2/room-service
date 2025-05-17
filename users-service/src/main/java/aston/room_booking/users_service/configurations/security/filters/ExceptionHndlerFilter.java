@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ import java.io.IOException;
  * @author 4ndr33w
  * @version 1.0
  */
-@Configuration
+@Component
 @AllArgsConstructor
 public class ExceptionHndlerFilter extends OncePerRequestFilter {
 
