@@ -31,7 +31,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDTO cancelledBooking(UUID bookingId, Long userId) {
+    public BookingDTO cancelledBookingByBookingId(UUID bookingId, Long userId) {
         int updated = bookingRepository.updateBookingStatus(Status.ACTIVE, Status.CANCELLED, bookingId, userId);
         if (updated > 0) {
             return bookingMapper.toBookingDTO(
@@ -42,7 +42,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDTO> getAll(Long userId) {
+    public List<BookingDTO> getAllBookingsByUserId(Long userId) {
         return Optional.of(bookingRepository.getAllByUserId(userId))
                 .filter(list -> !list.isEmpty())
                 .orElseThrow(BookingsUserNotFoundException::new)

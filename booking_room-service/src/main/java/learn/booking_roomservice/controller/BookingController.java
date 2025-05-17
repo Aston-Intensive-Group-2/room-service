@@ -36,9 +36,9 @@ public class BookingController {
             @ApiResponse(responseCode = "204", description = "Бронирования не найдены")
     })
     @GetMapping("/all")
-    public ResponseEntity<List<BookingWithUserDTO>> getAll(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<List<BookingWithUserDTO>> getAllBookingsUser(@RequestHeader("Authorization") String authHeader) {
         UserDTO user = userServerProxy.get(authHeader).getBody();
-        List<BookingWithUserDTO> bookings = bookingService.getAll(user.id())
+        List<BookingWithUserDTO> bookings = bookingService.getAllBookingsByUserId(user.id())
                 .stream()
                 .map(b -> new BookingWithUserDTO(b.id(), user, b.roomId(), b.start(), b.end(), b.status(), b.createdAt()))
                 .toList();
@@ -76,12 +76,12 @@ public class BookingController {
             @ApiResponse(responseCode = "404", description = "Активное бронирование не найдено")
     })
     @PatchMapping("/cancelled")
-    public ResponseEntity<BookingDTO> cancelledBooking(
+    public ResponseEntity<BookingDTO> cancelledBookingUserByBookingId(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody @Valid CancelRequestDTO cancelRequestDTO
             ) {
         UserDTO user = userServerProxy.get(authHeader).getBody();
-        BookingDTO bookingDTO = bookingService.cancelledBooking(cancelRequestDTO.bookingId(), user.id());
+        BookingDTO bookingDTO = bookingService.cancelledBookingByBookingId(cancelRequestDTO.bookingId(), user.id());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(bookingDTO);
@@ -116,7 +116,7 @@ public class BookingController {
     })
     @GetMapping("/all/{userId}")
     public ResponseEntity<List<BookingDTO>> getAllBookings(@PathVariable Long userId) {
-        List<BookingDTO> bookings = bookingService.getAll(userId);
+        List<BookingDTO> bookings = bookingService.getAllBookingsByUserId(userId);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(bookings);

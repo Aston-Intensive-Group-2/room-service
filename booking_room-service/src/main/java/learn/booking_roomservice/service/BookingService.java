@@ -24,7 +24,7 @@ public interface BookingService {
      * @return обновленное бронирование с отмененным статусом
      * @exception learn.booking_roomservice.exception.BookingNotFoundException если активное бронирование не найдено
      */
-    BookingDTO cancelledBooking(UUID bookingId, Long userId);
+    BookingDTO cancelledBookingByBookingId(UUID bookingId, Long userId);
 
     /**
      * Возвращает список бронирований пользователя.
@@ -32,7 +32,7 @@ public interface BookingService {
      * @return Список бронирований
      * @exception learn.booking_roomservice.exception.BookingsUserNotFoundException если у пользователя бронирований не найдено
      */
-    List<BookingDTO> getAll(Long userId);
+    List<BookingDTO> getAllBookingsByUserId(Long userId);
 
     /**
      * Возвращает бронирование по идентификатору.

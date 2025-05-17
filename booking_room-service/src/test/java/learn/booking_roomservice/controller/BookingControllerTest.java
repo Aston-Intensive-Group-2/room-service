@@ -122,7 +122,7 @@ class BookingControllerTest {
         // given
         List<BookingDTO> bookings = List.of(bookingDTO);
         given(userServerProxy.get(token)).willReturn(ResponseEntity.ok(userDTO));
-        given(bookingService.getAll(userDTO.id())).willReturn(bookings);
+        given(bookingService.getAllBookingsByUserId(userDTO.id())).willReturn(bookings);
 
         // when/then
         mockMvc.perform(get("/booking/all")
@@ -133,7 +133,7 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$[0].roomId").value(2));
 
         // verify
-        verify(bookingService, times(1)).getAll(userDTO.id());
+        verify(bookingService, times(1)).getAllBookingsByUserId(userDTO.id());
         verify(userServerProxy).get(token);
     }
 
@@ -141,7 +141,7 @@ class BookingControllerTest {
     void getAll_shouldReturnException_whenBookingsNotFound() throws Exception {
         // given
         given(userServerProxy.get(token)).willReturn(ResponseEntity.ok(userDTO));
-        given(bookingService.getAll(userDTO.id())).willThrow(BookingsUserNotFoundException.class);
+        given(bookingService.getAllBookingsByUserId(userDTO.id())).willThrow(BookingsUserNotFoundException.class);
 
         // when/then
         mockMvc.perform(get("/booking/all")
@@ -159,7 +159,7 @@ class BookingControllerTest {
                 LocalDateTime.of(2025, 5, 15, 15, 30),
                 Status.CANCELLED, LocalDateTime.now());
         given(userServerProxy.get(token)).willReturn(ResponseEntity.ok(userDTO));
-        given(bookingService.cancelledBooking(bookingId, userDTO.id())).willReturn(cancelledBooking);
+        given(bookingService.cancelledBookingByBookingId(bookingId, userDTO.id())).willReturn(cancelledBooking);
 
         // when/then
         mockMvc.perform(patch("/booking/cancelled")
@@ -174,7 +174,7 @@ class BookingControllerTest {
 
         // verify
         verify(userServerProxy, times(1)).get(token);
-        verify(bookingService, times(1)).cancelledBooking(requestDTO.bookingId(), userDTO.id());
+        verify(bookingService, times(1)).cancelledBookingByBookingId(requestDTO.bookingId(), userDTO.id());
     }
 
     @Test
@@ -183,7 +183,7 @@ class BookingControllerTest {
         UUID bookingId = UUID.randomUUID();
         CancelRequestDTO requestDTO = new CancelRequestDTO(bookingId);
         given(userServerProxy.get(token)).willReturn(ResponseEntity.ok(userDTO));
-        given(bookingService.cancelledBooking(bookingId, userDTO.id())).willThrow(BookingNotFoundException.class);
+        given(bookingService.cancelledBookingByBookingId(bookingId, userDTO.id())).willThrow(BookingNotFoundException.class);
 
         // when/then
         mockMvc.perform(patch("/booking/cancelled")
@@ -195,6 +195,6 @@ class BookingControllerTest {
 
         // verify
         verify(userServerProxy, times(1)).get(token);
-        verify(bookingService, times(1)).cancelledBooking(requestDTO.bookingId(), userDTO.id());
+        verify(bookingService, times(1)).cancelledBookingByBookingId(requestDTO.bookingId(), userDTO.id());
     }
 }
