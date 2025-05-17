@@ -2,11 +2,15 @@ server:
   port: 8093
 
 spring:
+  main:
+    banner-mode: off
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:5432}/room_db
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:password}
+
   application:
     name: room-service
 
@@ -22,8 +26,14 @@ spring:
     init:
       mode: always
 
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
 eureka:
   client:
+    enabled: true
     service-url:
       defaultZone: http://${SPRING_DISCOVERY_SERVER_HOST:discovery-server}:8761/eureka/
   instance:
