@@ -91,7 +91,7 @@ class BookingServiceImplTest {
         when(bookingMapper.toBookingDTO(booking)).thenReturn(bookingDTO);
 
         // when
-        BookingDTO bookingDTO1 = bookingService.cancelledBooking(bookingId, userId);
+        BookingDTO bookingDTO1 = bookingService.cancelledBookingByBookingId(bookingId, userId);
 
         // then
         assertEquals(bookingDTO, bookingDTO1);
@@ -107,7 +107,7 @@ class BookingServiceImplTest {
         when(bookingRepository.updateBookingStatus(Status.ACTIVE, Status.CANCELLED, bookingId, userId)).thenReturn(0);
 
         // when/then
-        assertThrows(BookingNotFoundException.class, () -> bookingService.cancelledBooking(bookingId, userId));
+        assertThrows(BookingNotFoundException.class, () -> bookingService.cancelledBookingByBookingId(bookingId, userId));
 
         // verify
         verify(bookingRepository, times(0)).findById(bookingId);
@@ -122,7 +122,7 @@ class BookingServiceImplTest {
         when(bookingMapper.toBookingDTO(booking)).thenReturn(bookingDTO);
 
         // when
-        List<BookingDTO> bookingDTOS = bookingService.getAll(userId);
+        List<BookingDTO> bookingDTOS = bookingService.getAllBookingsByUserId(userId);
 
         // then
         assertEquals(listDto, bookingDTOS);
@@ -139,7 +139,7 @@ class BookingServiceImplTest {
         when(bookingRepository.getAllByUserId(userId)).thenReturn(emptyBookings);
 
         // when/then
-        assertThrows(BookingsUserNotFoundException.class, () -> bookingService.getAll(userId));
+        assertThrows(BookingsUserNotFoundException.class, () -> bookingService.getAllBookingsByUserId(userId));
 
         // verify
         verify(bookingRepository, times(1)).getAllByUserId(userId);
