@@ -5,9 +5,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import learn.booking_roomservice.clients.UserServerProxy;
+import learn.booking_roomservice.clients.RoomServiceProxy;
+import learn.booking_roomservice.clients.UserServiceProxy;
 import learn.booking_roomservice.dto.BookingDTO;
-import learn.booking_roomservice.dto.BookingWithUserDTO;
+import learn.booking_roomservice.dto.BookingWithUserAndRoomDTO;
 import learn.booking_roomservice.dto.CancelRequestDTO;
 import learn.booking_roomservice.dto.UserDTO;
 import learn.booking_roomservice.service.BookingService;
@@ -25,7 +26,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookingController {
     private final BookingService bookingService;
-    private final UserServerProxy userServerProxy;
+    private final UserServiceProxy userServerProxy;
+    private final RoomServiceProxy roomServiceProxy;
 
     @Operation(
             summary = "Получить все бронирования пользователя",
@@ -36,11 +38,11 @@ public class BookingController {
             @ApiResponse(responseCode = "204", description = "Бронирования не найдены")
     })
     @GetMapping("/all")
-    public ResponseEntity<List<BookingWithUserDTO>> getAllBookingsUser(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<List<BookingWithUserAndRoomDTO>> getAllBookingsUser(@RequestHeader("Authorization") String authHeader) {
         UserDTO user = userServerProxy.get(authHeader).getBody();
-        List<BookingWithUserDTO> bookings = bookingService.getAllBookingsByUserId(user.id())
+        List<BookingWithUserAndRoomDTO> bookings = bookingService.getAllBookingsByUserId(user.id())
                 .stream()
-                .map(b -> new BookingWithUserDTO(b.id(), user, b.roomId(), b.start(), b.end(), b.status(), b.createdAt()))
+                .map(b -> new BookingWithUserAndRoomDTO(b.id(), user, roomServiceProxy.getRoom(b.roomId()).getBody(), b.start(), b.end(), b.status(), b.createdAt()))
                 .toList();
         return ResponseEntity
                 .status(HttpStatus.OK)

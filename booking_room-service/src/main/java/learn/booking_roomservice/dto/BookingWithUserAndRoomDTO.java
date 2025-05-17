@@ -7,13 +7,13 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Schema(description = "Бронирование с информацией о пользователе")
-public record BookingWithUserDTO(
+public record BookingWithUserAndRoomDTO(
         @Schema(description = "Идентификатор бронирования", example = "f47ac10b-58cc-4372-a567-0e02b2c3d479")
         UUID id,
         @Schema(description = "Информация о пользователе")
         UserDTO user,
-        @Schema(description = "Идентификатор помещения", example = "101")
-        Long roomId,
+        @Schema(description = "Информация о помещении")
+        RoomDTO room,
         @Schema(description = "Начало бронирования", example = "2025-05-15T13:30:00")
         LocalDateTime start,
         @Schema(description = "Конец бронирования", example = "2025-05-15T15:30:00")
