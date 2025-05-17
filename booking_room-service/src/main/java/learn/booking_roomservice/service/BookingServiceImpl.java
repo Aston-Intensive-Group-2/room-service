@@ -51,6 +51,14 @@ public class BookingServiceImpl implements BookingService {
                 .toList();
     }
 
+    @Override
+    public BookingDTO getBookingById(Long userId, UUID bookingId) {
+        return bookingRepository.findById(bookingId)
+                .filter(booking -> booking.getUserId().equals(userId))
+                .map(bookingMapper::toBookingDTO)
+                .orElseThrow(BookingNotFoundException::new);
+    }
+
     private boolean isValidRegistration(BookingDTO bookingDTO) {
         return bookingRepository.getBookingByTime(bookingDTO.roomId(), bookingDTO.start(), bookingDTO.end()).isEmpty();
     }

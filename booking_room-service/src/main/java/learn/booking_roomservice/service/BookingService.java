@@ -33,4 +33,13 @@ public interface BookingService {
      * @exception learn.booking_roomservice.exception.BookingsUserNotFoundException если у пользователя бронирований не найдено
      */
     List<BookingDTO> getAll(Long userId);
+
+    /**
+     * Возвращает бронирование по идентификатору.
+     * @param userId идентификатор пользователя
+     * @param bookingId идентификатор бронирования
+     * @return бронирование
+     * @exception learn.booking_roomservice.exception.BookingNotFoundException если бронирование не найдено
+     */
+    BookingDTO getBookingById(Long userId, UUID bookingId);
 }

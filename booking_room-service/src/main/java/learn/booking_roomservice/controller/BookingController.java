@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "Бронирование", description = "Операции для управления бронированиями")
 @RestController
@@ -84,5 +85,40 @@ public class BookingController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(bookingDTO);
+    }
+
+    @Operation(
+            summary = "Получить бронирование по ID",
+            description = "Возвращает бронирование по идентификатору"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Бронирование найдено"),
+            @ApiResponse(responseCode = "404", description = "Бронирование не найдено")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<BookingDTO> getBookingById(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable UUID id) {
+        UserDTO user = userServerProxy.get(authHeader).getBody();
+        BookingDTO bookingDTO = bookingService.getBookingById(user.id(), id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(bookingDTO);
+    }
+
+    @Operation(
+            summary = "Получить все бронирования пользователя по ID",
+            description = "Возвращает список всех бронирований пользователя по ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Бронирования найдены"),
+            @ApiResponse(responseCode = "204", description = "Бронирования не найдены")
+    })
+    @GetMapping("/all/{userId}")
+    public ResponseEntity<List<BookingDTO>> getAllBookings(@PathVariable Long userId) {
+        List<BookingDTO> bookings = bookingService.getAll(userId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(bookings);
     }
 }

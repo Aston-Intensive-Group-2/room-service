@@ -40,6 +40,6 @@ public record BookingDTO(
         LocalDateTime createdAt
 ) {
     public BookingDTO(Long userId, Long roomId, LocalDateTime start, LocalDateTime end) {
-        this(null, userId, roomId, start, end, Status.ACTIVE, LocalDateTime.now());
+            this(UUID.randomUUID(), userId, roomId, start, end, Status.ACTIVE, LocalDateTime.now());
     }
 }
