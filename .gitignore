@@ -4,3 +4,5 @@ target/
 .gigaide/
 .idea/
 tests-service/
+
+.DS_Store
