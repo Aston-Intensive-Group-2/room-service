@@ -2,8 +2,10 @@ package aston.room_booking.notification_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
+@EnableFeignClients(basePackages = "aston.room_booking.notification_service.clients")
 public class NotificationServiceApplication {
 
     public static void main(String[] args) {
