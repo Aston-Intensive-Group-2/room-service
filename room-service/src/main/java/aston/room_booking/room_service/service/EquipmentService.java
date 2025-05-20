@@ -9,6 +9,6 @@ public interface EquipmentService {
     List<EquipmentDto> getEquipmentList();
     EquipmentDto getEquipmentById(Long equipmentId);
     EquipmentDto createEquipment(EquipmentCreateRequestDto equipmentCreateRequestDto);
-    EquipmentDto updateEquipment(EquipmentUpdateRequestDto equipmentUpdateRequestDto);
+    EquipmentDto updateEquipmentById(Long equipmentId, EquipmentUpdateRequestDto equipmentUpdateRequestDto);
     void deleteEquipmentById(Long equipmentId);
 }

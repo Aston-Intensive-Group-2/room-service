@@ -36,12 +36,12 @@ public class EquipmentController {
         return ResponseEntity.status(HttpStatus.OK).body(equipmentService.createEquipment(equipmentCreateRequestDto));
     }
 
-    @PutMapping
-    public ResponseEntity<EquipmentDto> updateEquipment(@RequestBody EquipmentUpdateRequestDto equipmentUpdateRequestDto, @RequestHeader("Authorization") String authHeader) {
+    @PutMapping("/update/{equipmentId}")
+    public ResponseEntity<EquipmentDto> updateEquipmentById(@PathVariable Long equipmentId, @RequestBody EquipmentUpdateRequestDto equipmentUpdateRequestDto, @RequestHeader("Authorization") String authHeader) {
         if (!tokenService.getUserRoles(authHeader.substring(7)).contains("ADMIN")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        return ResponseEntity.status(HttpStatus.OK).body(equipmentService.updateEquipment(equipmentUpdateRequestDto));
+        return ResponseEntity.status(HttpStatus.OK).body(equipmentService.updateEquipmentById(equipmentId, equipmentUpdateRequestDto));
     }
 
     @DeleteMapping("/{equipmentId}")

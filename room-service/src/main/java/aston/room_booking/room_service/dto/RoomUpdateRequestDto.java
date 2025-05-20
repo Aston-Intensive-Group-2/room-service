@@ -4,7 +4,6 @@ import aston.room_booking.room_service.model.RoomStatus;
 import java.util.List;
 
 public record RoomUpdateRequestDto(
-        Long roomId,
         Integer roomWidth,
         Integer roomLength,
         Integer roomHeight,

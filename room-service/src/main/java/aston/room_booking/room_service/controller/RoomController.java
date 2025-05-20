@@ -39,12 +39,12 @@ public class RoomController {
         return ResponseEntity.status(HttpStatus.OK).body(roomService.createRoom(roomCreateRequestDto));
     }
 
-    @PutMapping
-    public ResponseEntity<RoomDto> updateRoom(@RequestBody RoomUpdateRequestDto roomUpdateRequestDto, @RequestHeader("Authorization") String authHeader) {
+    @PutMapping("/update/{roomId}")
+    public ResponseEntity<RoomDto> updateRoomById(@PathVariable Long roomId, @RequestBody RoomUpdateRequestDto roomUpdateRequestDto, @RequestHeader("Authorization") String authHeader) {
         if (!tokenService.getUserRoles(authHeader.substring(7)).contains("ADMIN")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        return ResponseEntity.status(HttpStatus.OK).body(roomService.updateRoom(roomUpdateRequestDto));
+        return ResponseEntity.status(HttpStatus.OK).body(roomService.updateRoomById(roomId, roomUpdateRequestDto));
     }
 
     @DeleteMapping("/{roomId}")

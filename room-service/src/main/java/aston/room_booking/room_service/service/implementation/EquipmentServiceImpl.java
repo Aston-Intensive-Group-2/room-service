@@ -40,8 +40,8 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public EquipmentDto updateEquipment(EquipmentUpdateRequestDto equipmentUpdateRequestDto) {
-        EquipmentEntity currentEquipmentEntity = equipmentRepository.findById(equipmentUpdateRequestDto.equipmentId()).get();
+    public EquipmentDto updateEquipmentById(Long equipmentId, EquipmentUpdateRequestDto equipmentUpdateRequestDto) {
+        EquipmentEntity currentEquipmentEntity = equipmentRepository.findById(equipmentId).get();
         currentEquipmentEntity.setEquipmentName(equipmentUpdateRequestDto.equipmentName());
         currentEquipmentEntity.setEquipmentType(equipmentUpdateRequestDto.equipmentType());
         currentEquipmentEntity.setRoomEntity(roomMapper.toEntity(equipmentUpdateRequestDto.roomDto()));

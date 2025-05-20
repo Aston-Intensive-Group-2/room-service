@@ -11,6 +11,6 @@ public interface RoomService {
     List<RoomDto> getFilteredRoomList(RoomGetFilteredRequestDto roomGetFilteredRequestDto);
     RoomDto getRoomById(Long roomId);
     RoomDto createRoom(RoomCreateRequestDto roomCreateRequestDto);
-    RoomDto updateRoom(RoomUpdateRequestDto roomUpdateRequestDto);
+    RoomDto updateRoomById(Long roomId, RoomUpdateRequestDto roomUpdateRequestDto);
     void deleteRoomById(Long roomId);
 }

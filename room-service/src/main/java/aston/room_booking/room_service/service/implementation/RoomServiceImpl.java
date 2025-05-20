@@ -51,8 +51,8 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public RoomDto updateRoom(RoomUpdateRequestDto roomUpdateRequestDto) {
-        RoomEntity currentRoomEntity = roomRepository.findById(roomUpdateRequestDto.roomId()).get();
+    public RoomDto updateRoomById(Long roomId, RoomUpdateRequestDto roomUpdateRequestDto) {
+        RoomEntity currentRoomEntity = roomRepository.findById(roomId).get();
         currentRoomEntity.setRoomWidth(roomUpdateRequestDto.roomWidth());
         currentRoomEntity.setRoomLength(roomUpdateRequestDto.roomLength());
         currentRoomEntity.setRoomHeight(roomUpdateRequestDto.roomHeight());
