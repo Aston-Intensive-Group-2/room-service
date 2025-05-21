@@ -1,5 +1,6 @@
-package aston.room_booking.room_service.utilities;
+package aston.room_booking.room_service.configuration;
 
+import aston.room_booking.room_service.utilities.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
