@@ -8,6 +8,7 @@ import aston.room_booking.room_service.mapper.RoomMapper;
 import aston.room_booking.room_service.model.entity.EquipmentEntity;
 import aston.room_booking.room_service.repository.EquipmentRepository;
 import aston.room_booking.room_service.service.EquipmentService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -30,6 +31,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
+    @Transactional
     public EquipmentDto createEquipment(EquipmentCreateRequestDto equipmentCreateRequestDto) {
         EquipmentEntity futureEquipmentEntity = EquipmentEntity.builder()
                 .equipmentName(equipmentCreateRequestDto.equipmentName())
@@ -40,6 +42,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
+    @Transactional
     public EquipmentDto updateEquipmentById(Long equipmentId, EquipmentUpdateRequestDto equipmentUpdateRequestDto) {
         EquipmentEntity currentEquipmentEntity = equipmentRepository.findById(equipmentId).get();
         currentEquipmentEntity.setEquipmentName(equipmentUpdateRequestDto.equipmentName());
@@ -49,6 +52,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
+    @Transactional
     public void deleteEquipmentById(Long equipmentId) {
         equipmentRepository.deleteById(equipmentId);
     }

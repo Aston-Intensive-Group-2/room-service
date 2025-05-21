@@ -10,6 +10,7 @@ import aston.room_booking.room_service.model.RoomStatus;
 import aston.room_booking.room_service.model.entity.RoomEntity;
 import aston.room_booking.room_service.repository.RoomRepository;
 import aston.room_booking.room_service.service.RoomService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -38,6 +39,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional
     public RoomDto createRoom(RoomCreateRequestDto roomCreateRequestDto) {
         RoomEntity futureRoomEntity = RoomEntity.builder()
                 .roomWidth(roomCreateRequestDto.roomWidth())
@@ -51,6 +53,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional
     public RoomDto updateRoomById(Long roomId, RoomUpdateRequestDto roomUpdateRequestDto) {
         RoomEntity currentRoomEntity = roomRepository.findById(roomId).get();
         currentRoomEntity.setRoomWidth(roomUpdateRequestDto.roomWidth());
@@ -63,6 +66,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional
     public void deleteRoomById(Long roomId) {
         roomRepository.deleteById(roomId);
     }
