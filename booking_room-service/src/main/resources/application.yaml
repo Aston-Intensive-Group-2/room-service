@@ -1,0 +1,31 @@
+server:
+  port: 8092
+
+database:
+  name: booking_db
+  username: booking_user
+  password: booking_password
+  url: jdbc:postgresql://localhost:5433/booking_db
+
+spring:
+  application:
+    name: booking_room-service
+  datasource:
+    url: ${database.url}
+    username: ${database.username}
+    password: ${database.password}
+    driver-class-name: org.postgresql.Driver
+
+  liquibase:
+    url: ${database.url}
+    user: ${database.username}
+    password: ${database.password}
+    change-log: classpath:db/migration/changelog.xml
+    default-schema: public
+    contexts: development
+    enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

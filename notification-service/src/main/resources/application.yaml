@@ -2,9 +2,28 @@ server:
   port: 8094
 
 spring:
+  mail:
+    host: smtp.mail.ru
+    port: 587
+    username: roomservicenotification@mail.ru
+    password: NrGFWpQCWpWhNERscLDB
+#    protocol: smtps
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          required:
+            enable: true
+      debug: true
+    transport:
+      protocol: smtp
+#          ssl:
+#            enable: true
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:5432}/notification_db
+    url: jdbc:postgresql://${SPRING_DATASOURCE_HOST:localhost}:${SPRING_DATASOURCE_PORT:5444}/notification_db
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:password}
   application:
@@ -31,6 +50,15 @@ eureka:
 
 logging:
   level:
+    org.springframework.jdbc.datasource.DriverManagerDataSource: DEBUG
     org.springframework.orm.jpa: INFO
     org.springframework.transaction: INFO
     org.springframework.web: INFO
+
+telegram:
+  bot-token: "7944346943:AAHXs9xQ3bVHcYBDQ8me4ooDaxxrDgJLry8"
+  chat-id: "310075966"
+
+notification:
+  email:
+    from: roomservicenotification@mail.ru
